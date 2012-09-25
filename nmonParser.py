@@ -31,7 +31,7 @@ class nmonParser:
 				self.dataPtr+=1
 				bits = l.strip().split(",")
 				tmp={}
-				for b in bits[1:]:
+				for b in bits[2:]:
 					tmp[b]=[]
 				self.outData[bits[0]]=tmp
 				
@@ -48,10 +48,25 @@ class nmonParser:
 		for l in self.rawdata[self.dataPtr:]:
 			if "ZZZZ," in l:
 				#extract time
-				print l
+				bits = l.strip().split(',')
+				print bits[3],bits[2],"\t",l
 			else:
 				# split into bits and append
-				bits = l.strip.split(',')
+				bits = l.strip().split(',')
+				# TODO: better Checking for T#### 
+				if bits[1].find("T")==0:
+					tmp = self.outData[bits[0]]
+					if len(tmp)!=len(bits[2:]):
+						print "\n"
+						print bits
+						print len(tmp),len(bits[2:])
+						print tmp
+						print bits[2:]
+				else:
+					# i think we have a new field lets add it
+					for b in bits[2:]:
+						tmp[b]=[]
+					self.outData[bits[0]]=tmp
 			
 	def parse(self):
 		# TODO: check fname
@@ -60,6 +75,7 @@ class nmonParser:
 		self.parseSysInfo()
 		self.parseCols()
 		self.parseBBBP()
-		self.parseSnapshots()
 		print self.outData
+		self.parseSnapshots()
+		
 
