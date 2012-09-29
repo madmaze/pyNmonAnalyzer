@@ -1,4 +1,4 @@
-nmon2csv
+pyNmonAnalyzer
 ========
 
 A tool for parsing and reshuffeling nmon's output into "normal" csv format.
