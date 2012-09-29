@@ -8,7 +8,7 @@ class nmonParser:
 	dataPtr=0
 	sysInfo=[]
 	
-	def __init__(self, fname="./nmon",outdir=""):
+	def __init__(self, fname="./test.nmon",outdir=""):
 		self.fname = fname
 		self.outdir = outdir
 	
