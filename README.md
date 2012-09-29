@@ -1,7 +1,16 @@
 nmon2csv
 ========
 
-A tool for parsing and reshuffeling nmon's out put into Excel/Spreadsheet readable format
+A tool for parsing and reshuffeling nmon's output into "normal" csv format.
+Currently nmon puts out a long file with a header at the beginning, and continuously
+appended by timestamps. This makes it hard to bring the raw data into an easily 
+machine readable format.
+
+Goals:
+-----
+- successfully parse NMON output (modularize it)
+- (ability to) produce CSV files for every(or all-in-one) captured resource
+- (ability to) produce charts with matplotlib or gnuplot (or both)
 
 
 License:
