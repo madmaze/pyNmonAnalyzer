@@ -5,77 +5,65 @@ class nmonParser:
 	outdir = ""
 	rawdata = []
 	outData = {}
-	dataPtr=0
+	
 	sysInfo=[]
+	bbbInfo=[]
+	tStamp={}
 	
 	def __init__(self, fname="./test.nmon",outdir=""):
 		self.fname = fname
 		self.outdir = outdir
 	
-	def parseSysInfo(self):
-		for l in self.rawdata:
-			if "AAA," in l:
-				self.dataPtr+=1
-				# TODO: Strip row heading
-				self.sysInfo.append(l.strip())
+	def processLine(self,header,line):
+		if "AAA" in header:
+			# we are looking at the basic System Specs
+			self.sysInfo.append(line[1:])
+		elif "BBB" in header:
+			# more detailed System Spec
+			# do more grandular processing
+			# refer to pg 11 of analyzer handbook
+			self.bbbInfo.append(line)
+		elif "ZZZZ" in header:
+			self.tStamp[line[1]]=line[2]
+		else:
+			if line[0] in self.outData.keys():
+				#print "already here"
+				table=self.outData[line[0]]
+				for n,col in enumerate(table):
+					# line[1] give you the T####
+					if line[n+1] in self.tStamp.keys():
+						# lookup the time stamp in tStamp
+						col.append(self.tStamp[line[n+1]])
+					else:
+						col.append(line[n+1])
+					
 			else:
-				#if we have finished reading AAA break out 
-				break
+				# new collumn, hoping these are headers
+				header=[]
+				for h in line[1:]:
+					tmp=[]
+					tmp.append(h)
+					header.append(tmp)
+				self.outData[line[0]]=header
 			
-	def parseCols(self):
-		for l in self.rawdata[self.dataPtr:]:
-			if "BBBP," in l:
-				#if we have finished reading headers break
-				break
-			else:
-				self.dataPtr+=1
-				bits = l.strip().split(",")
-				tmp={}
-				for b in bits[2:]:
-					tmp[b]=[]
-				self.outData[bits[0]]=tmp
 				
-	def parseBBBP(self):
-		for l in self.rawdata[self.dataPtr:]:
-			if "BBBP," in l:
-				self.dataPtr+=1
-				self.sysInfo.append(l.strip())
-			else:
-				#if we have finished reading BBBP break out
-				break
-			
-	def parseSnapshots(self):
-		for l in self.rawdata[self.dataPtr:]:
-			if "ZZZZ," in l:
-				#extract time
-				bits = l.strip().split(',')
-				print bits[3],bits[2],"\t",l
-			else:
-				# split into bits and append
-				bits = l.strip().split(',')
-				# TODO: better Checking for T#### 
-				if bits[1].find("T")==0:
-					tmp = self.outData[bits[0]]
-					if len(tmp)!=len(bits[2:]):
-						print "\n"
-						print bits
-						print len(tmp),len(bits[2:])
-						print tmp
-						print bits[2:]
-				else:
-					# i think we have a new field lets add it
-					for b in bits[2:]:
-						tmp[b]=[]
-					self.outData[bits[0]]=tmp
-			
 	def parse(self):
 		# TODO: check fname
 		f = open(self.fname,"r")
 		self.rawdata = f.readlines()
-		self.parseSysInfo()
-		self.parseCols()
-		self.parseBBBP()
-		print self.outData
-		self.parseSnapshots()
+		for l in self.rawdata:
+			l=l.strip()
+			bits=l.split(',')
+			self.processLine(bits[0],bits)
+			#if bits[1] == "T0002":
+			#	for l in self.outData.keys():
+			#		print self.outData[l]
+			#	exit()
+		#self.parseSysInfo()
+		#self.parseCols()
+		#self.parseBBBP()
+		for l in self.outData.keys():
+			print l, self.outData[l]
+		#self.parseSnapshots()
 		
 
