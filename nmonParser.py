@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import os
+from shutil import rmtree 
+
 class nmonParser:
 	fname = ""
 	outdir = ""
@@ -10,12 +13,30 @@ class nmonParser:
 	bbbInfo=[]
 	tStamp={}
 	
-	def __init__(self, fname="./test.nmon",outdir="./data/"):
+	def __init__(self, fname="./test.nmon",outdir="./data/",overwrite=False):
 		self.fname = fname
 		self.outdir = outdir
+		# check ouput dir, if not create
+		if os.path.exists(self.outdir) and overwrite:
+			try:
+				rmtree(self.outdir)
+			except:
+				print "[ERROR] removing old dir:",self.outdir
+				exit()
+				
+		elif os.path.exists(self.outdir):
+			print "[ERROR] results directory already exists, please remove or use '-x' to overwrite"
+			exit()
+			
+		# Create results path if not existing
+		try:
+			os.makedirs(self.outdir)
+		except:
+			print "[ERROR] creating results dir:",self.outdir
+			exit()
 		
 	def outputCSV(self, stat):
-		outFile = open(self.outdir+stat+".csv","w")
+		outFile = open(os.path.join(self.outdir,stat+".csv"),"w")
 		line=""
 		# Iterate over each row
 		for n in range(len(self.outData[stat][0])):
