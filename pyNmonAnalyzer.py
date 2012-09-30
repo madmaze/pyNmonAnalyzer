@@ -2,6 +2,6 @@
 import nmonParser
 
 if __name__ == "__main__":
-	T=nmonParser.nmonParser()
-	T.parse()
+	P=nmonParser.nmonParser()
+	P.parse()
 

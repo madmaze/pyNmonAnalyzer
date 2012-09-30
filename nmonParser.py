@@ -10,9 +10,23 @@ class nmonParser:
 	bbbInfo=[]
 	tStamp={}
 	
-	def __init__(self, fname="./test.nmon",outdir=""):
+	def __init__(self, fname="./test.nmon",outdir="./data/"):
 		self.fname = fname
 		self.outdir = outdir
+		
+	def outputCSV(self, stat):
+		outFile = open(self.outdir+stat+".csv","w")
+		line=""
+		# Iterate over each row
+		for n in range(len(self.outData[stat][0])):
+			line=""
+			# Iterate over each column
+			for col in self.outData[stat]:
+				if line == "":
+					line+=col[n]
+				else:
+					line+=","+col[n]
+			outFile.write(line+"\n")
 	
 	def processLine(self,header,line):
 		if "AAA" in header:
@@ -24,7 +38,7 @@ class nmonParser:
 			# refer to pg 11 of analyzer handbook
 			self.bbbInfo.append(line)
 		elif "ZZZZ" in header:
-			self.tStamp[line[1]]=line[2]
+			self.tStamp[line[1]]=line[3]+" "+line[2]
 		else:
 			if line[0] in self.outData.keys():
 				#print "already here"
@@ -55,15 +69,10 @@ class nmonParser:
 			l=l.strip()
 			bits=l.split(',')
 			self.processLine(bits[0],bits)
-			#if bits[1] == "T0002":
-			#	for l in self.outData.keys():
-			#		print self.outData[l]
-			#	exit()
-		#self.parseSysInfo()
-		#self.parseCols()
-		#self.parseBBBP()
+
+		# Write out to multiple CSV files
 		for l in self.outData.keys():
-			print l, self.outData[l]
-		#self.parseSnapshots()
+			self.outputCSV(l)
+
 		
 
