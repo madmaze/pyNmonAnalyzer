@@ -31,3 +31,4 @@ if __name__ == "__main__":
 	nmonP.parse()
 	
 	# TODO implement plotting options
+	nmonP.plotStat("CPU01")

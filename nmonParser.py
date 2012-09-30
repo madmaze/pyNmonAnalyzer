@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from shutil import rmtree 
+import matplotlib.pyplot as plt
 
 class nmonParser:
 	fname = ""
@@ -67,6 +68,26 @@ class nmonParser:
 				else:
 					line+=","+col[n]
 			outFile.write(line+"\n")
+	
+	def plotStat(self, stat):
+		fig = plt.figure(figsize=(10,6))
+		plot = fig.add_subplot(1,1,1)
+		cnt = len(self.outData["CPU01"][0][1:])
+		plot.plot(self.outData["CPU01"][1][1:])
+		
+		lcnt=10
+		ticks=[]
+		labels=[]
+		for n,l in enumerate(self.outData["CPU01"][0][1:]):
+			if n==cnt or n%lcnt==0:
+				labels.append(l)
+				ticks.append(n)
+				
+		plt.xticks(ticks,labels, size='small', rotation=90)
+		
+		plot.set_ylabel("CPU usage")
+		plot.set_xlabel("Time")
+		plt.show()
 	
 	def processLine(self,header,line):
 		if "AAA" in header:
