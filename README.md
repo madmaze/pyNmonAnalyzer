@@ -12,6 +12,22 @@ Goals:
 - (ability to) produce CSV files for every(or all-in-one) captured resource
 - (ability to) produce charts with matplotlib or gnuplot (or both)
 
+Usage:
+-----
+usage: pyNmonAnalyzer.py [-h] [-x] [-o OUTDIR] input_file
+
+nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for
+easier analysis, without the use of the MS Excel Macro
+
+positional arguments:
+  input_file            Input NMON file
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -x, --overwrite       overwrite existing results (Default: False)
+  -o OUTDIR, --output OUTDIR
+	                Output dir for CSV (Default: ./data/)
+
 
 License:
 --------
