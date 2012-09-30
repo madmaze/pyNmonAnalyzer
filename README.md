@@ -14,6 +14,7 @@ Goals:
 
 Usage:
 -----
+'''
 usage: pyNmonAnalyzer.py [-h] [-x] [-o OUTDIR] input_file
 
 nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for
@@ -27,7 +28,7 @@ optional arguments:
   -x, --overwrite       overwrite existing results (Default: False)
   -o OUTDIR, --output OUTDIR
 	                Output dir for CSV (Default: ./data/)
-
+'''
 
 License:
 --------
