@@ -32,3 +32,6 @@ if __name__ == "__main__":
 	
 	# TODO implement plotting options
 	nmonP.plotStat("CPU01")
+	nmonP.plotStat("CPU02")
+	nmonP.plotStat("CPU_ALL")
+	nmonP.plotStat("NET")
