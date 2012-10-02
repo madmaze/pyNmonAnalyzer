@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from shutil import rmtree 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+import datetime
 
 class nmonParser:
 	fname = ""
@@ -70,23 +72,27 @@ class nmonParser:
 			outFile.write(line+"\n")
 	
 	def plotStat(self, stat):
+		# figure dimensions
 		fig = plt.figure(figsize=(10,6))
-		plot = fig.add_subplot(1,1,1)
-		cnt = len(self.outData["CPU01"][0][1:])
-		plot.plot(self.outData["CPU01"][1][1:])
+		ax = fig.add_subplot(1,1,1)
 		
-		lcnt=10
-		ticks=[]
-		labels=[]
-		for n,l in enumerate(self.outData["CPU01"][0][1:]):
-			if n==cnt or n%lcnt==0:
-				labels.append(l)
-				ticks.append(n)
-				
-		plt.xticks(ticks,labels, size='small', rotation=90)
+		# parse NMON date/timestamps and produce datetime objects
+		dates = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.outData["CPU01"][0][1:]]
+		data =self.outData["CPU01"][1][1:]
 		
-		plot.set_ylabel("CPU usage")
-		plot.set_xlabel("Time")
+		# plot
+		ax.plot_date(dates, data, "-")
+		
+		# format axis
+		ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(10))
+		ax.xaxis.set_major_formatter(mpl.dates.DateFormatter("%m-%d %H:%M:%S"))
+		ax.xaxis.set_minor_locator(mpl.ticker.MaxNLocator(100))
+		ax.autoscale_view()
+		ax.grid(True)
+
+		fig.autofmt_xdate()
+		ax.set_ylabel("CPU usage in %")
+		ax.set_xlabel("Time")
 		plt.show()
 	
 	def processLine(self,header,line):
