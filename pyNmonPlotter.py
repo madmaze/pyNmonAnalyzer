@@ -45,51 +45,73 @@ class pyNmonPlotter:
 				values.append((self.processedData["CPU_ALL"][1][1:],"usr"))
 				values.append((self.processedData["CPU_ALL"][2][1:],"sys"))
 				values.append((self.processedData["CPU_ALL"][3][1:],"wait"))
+				
 				data=(times,values)
 				self.plotStat(data, xlabel="Time", ylabel="CPU load (%)", title="CPU vs Time", isPrct=True)
+				
 			elif "DISKBUSY" in stat:
+				# parse NMON date/timestamps and produce datetime objects
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
 				values=[]
 				values.append((self.processedData["DISKBUSY"][1][1:],self.processedData["CPU_ALL"][1][:1]))
+				
 				data=(times,values)
 				self.plotStat(data, xlabel="Time", ylabel="Disk Busy (%)", title="Disk Busy vs Time", isPrct=True)
+				
 			elif "MEM" in stat:
 				# parse NMON date/timestamps and produce datetime objects
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
 				values=[]
 				
 				mem=np.array(self.processedData["MEM"])
-				# total - free - buffers - chache
-				print np.array(mem[1][1:]).dtype
-				print np.array(mem[5][1:]).dtype
-				used = np.array(float(mem[1][1:])) - np.array(float(mem[5][1:]))
-				print used, type(mem[1][1:]), mem[5][1:]
-				exit()
-				#used = np.subtract(used, mem[10][1:])
-				#used = np.subtract(used, mem[13][1:])
-				print mem[1][:1], mem[5][:1], mem[10][:1], mem[13][:1]
+				
+				# used = total - free - buffers - chache
+				total = np.array([float(x) for x in mem[1][1:]])
+				free = np.array([float(x) for x in mem[5][1:]])
+				cache = np.array([float(x) for x in mem[5][1:]])
+				buffers = np.array([float(x) for x in mem[5][1:]])
+
+				used = total - free - cache - buffers
 				values.append((used,"used mem"))
-				values.append((mem[1][1:],"total mem"))
+				values.append((total,"total mem"))
+				
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="Memory in MB", title="Memory vs Time", isPrct=True, yrange=[0,max(mem[1][1:])*1.2])
+				self.plotStat(data, xlabel="Time", ylabel="Memory in MB", title="Memory vs Time", isPrct=False, yrange=[0,max(total)*1.2])
+				
+			elif "NET" in stat:
+				# parse NMON date/timestamps and produce datetime objects
+				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
+				values=[]
+				# TODO: break this out.. prob default to eth0
+				iface="wlan0"
+				
+				read=np.array([])
+				write=np.array([])
+				for i in self.processedData["NET"]:
+					colTitle = i[:1][0]
+					if iface in colTitle and "read" in colTitle:
+						read = np.array([float(x) for x in i[1:]])
+						values.append((read,colTitle))
+						
+					elif iface in colTitle and "write" in colTitle:
+						write = np.array([float(x) for x in i[1:]])
+						values.append((write,colTitle))
+				
+				data=(times,values)
+				self.plotStat(data, xlabel="Time", ylabel="Network KB/s", title="Net vs Time", yrange=[0,max(max(read),max(write))*1.2])
 		
-	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=True, yrange=[0,100]):
+	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=False, yrange=[0,100]):
 		
 		# figure dimensions
-		fig = plt.figure(figsize=(10,6))
+		fig = plt.figure(figsize=(12,4))
 		ax = fig.add_subplot(1,1,1)
 		
-		# parse NMON date/timestamps and produce datetime objects
+		# retrieve timestamps and datapoints
 		times, values = data 
-		#data =self.processedData[stat][1][1:]
-		#data2 =self.processedData["CPU02"][1][1:]
-		#dataAll =self.processedData["CPU_ALL"][1][1:]
 		
 		# plot
 		for v,label in values:
 			ax.plot_date(times, v, "-")
-		#ax.plot_date(dates, data2, "-")
-		#ax.plot_date(dates, dataAll, "-")
 		
 		# format axis
 		ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(10))
@@ -98,6 +120,8 @@ class pyNmonPlotter:
 		ax.autoscale_view()
 		if isPrct:
 			ax.set_ylim([0,100])
+		else:
+			ax.set_ylim(yrange)
 		ax.grid(True)
 
 		fig.autofmt_xdate()
@@ -107,7 +131,4 @@ class pyNmonPlotter:
 			plt.show()
 		else:
 			plt.savefig(os.path.join(self.imgPath,title.replace (" ", "_")+".png"))
-
-
-		
 

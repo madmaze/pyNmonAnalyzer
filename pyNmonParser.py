@@ -71,7 +71,14 @@ class pyNmonParser:
 						# lookup the time stamp in tStamp
 						col.append(self.tStamp[line[n+1]])
 					else:
+						# TODO: do parsing(str2float) here
 						col.append(line[n+1])
+						# this should always be a float
+						#try:
+						#	col.append(float(line[n+1]))
+						#except:
+						#	print line[n+1]
+						#	col.append(line[n+1])
 					
 			else:
 				# new collumn, hoping these are headers
