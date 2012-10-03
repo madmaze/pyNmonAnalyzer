@@ -24,6 +24,9 @@ import argparse
 class pyNmonAnalyzer:
 	# Holds final 2D arrays of each stat
 	processedData = {}
+	
+	nmonParser=""
+	
 	# Holds System Info gathered by nmon
 	sysInfo=[]
 	bbbInfo=[]
@@ -49,21 +52,29 @@ class pyNmonAnalyzer:
 		except:
 			print "[ERROR] creating results dir:",self.args.outdir
 			exit()
+		
+		# This is where the magic begins
+		self.nmonParser = pyNmonParser.pyNmonParser(args.input_file, args.outdir, args.overwrite)
+		self.processedData = self.nmonParser.parse()
+		
+		if self.args.outputCSV:
+			print "Preparing CSV files.."
+			self.outputData("csv")
+		if self.args.buildReport:
+			print "Preparing graphs.."
+			self.buildReport()
+		
+		print "\nAll done, exiting."
 	
 	def buildReport(self):
-		# This is where the magic begins
-		nmonParser=pyNmonParser.pyNmonParser(args.input_file, args.outdir, args.overwrite)
-		self.processedData=nmonParser.parse()
+		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, debug=self.args.debug)
+		stdReport = ["CPU","DISKBUSY","MEM","NET"]
 		
-		nmonPlotter=pyNmonPlotter.pyNmonPlotter(self.processedData, debug=self.args.debug)
-		stdReport=["CPU","DISKBUSY","MEM","NET"]
 		# TODO implement plotting options
 		nmonPlotter.plotStats(stdReport)
-		#nmonParser.output("csv")
-		#nmonPlotter.plotStat("CPU")
-		#nmonP.plotStat("CPU02")
-		#nmonP.plotStat("CPU_ALL")
-		#nmonP.plotStat("NET")
+		
+	def outputData(self, outputFormat):
+		self.nmonParser.output(outputFormat)
 		
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro")
@@ -71,8 +82,9 @@ if __name__ == "__main__":
 	parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
 	parser.add_argument("input_file", default="test.nmon", help="Input NMON file")
 	parser.add_argument("-o","--output", dest="outdir", default="./data/", help="Output dir for CSV (Default: ./data/)")
+	parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
+	parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
 	args = parser.parse_args()
 	
 	nmonAnalyzer=pyNmonAnalyzer(args)
-	nmonAnalyzer.buildReport()
 	
