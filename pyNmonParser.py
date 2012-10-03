@@ -17,92 +17,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-from shutil import rmtree 
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import datetime
 
-class nmonParser:
+class pyNmonParser:
 	fname = ""
 	outdir = ""
-	rawdata = []
-	
+
 	# Holds final 2D arrays of each stat
-	outData = {}
+	processedData = {}
 	# Holds System Info gathered by nmon
 	sysInfo=[]
 	bbbInfo=[]
 	# Holds timestamps for later lookup
 	tStamp={}
 	
-	def __init__(self, fname="./test.nmon",outdir="./data/",overwrite=False):
+	def __init__(self, fname="./test.nmon",outdir="./data/",overwrite=False,debug=False):
+		# TODO: check input vars or "die"
 		self.fname = fname
 		self.outdir = outdir
-		self.imgPath = outdir
-		self.debug = False
-		# check ouput dir, if not create
-		if os.path.exists(self.outdir) and overwrite:
-			try:
-				rmtree(self.outdir)
-			except:
-				print "[ERROR] removing old dir:",self.outdir
-				exit()
-				
-		elif os.path.exists(self.outdir):
-			print "[ERROR] results directory already exists, please remove or use '-x' to overwrite"
-			exit()
-			
-		# Create results path if not existing
-		try:
-			os.makedirs(self.outdir)
-		except:
-			print "[ERROR] creating results dir:",self.outdir
-			exit()
+		self.debug = debug
 		
 	def outputCSV(self, stat):
 		outFile = open(os.path.join(self.outdir,stat+".csv"),"w")
 		line=""
 		# Iterate over each row
-		for n in range(len(self.outData[stat][0])):
+		for n in range(len(self.processedData[stat][0])):
 			line=""
 			# Iterate over each column
-			for col in self.outData[stat]:
+			for col in self.processedData[stat]:
 				if line == "":
 					line+=col[n]
 				else:
 					line+=","+col[n]
 			outFile.write(line+"\n")
-	
-	def plotStat(self, stat):
-		isPrct=True
-		
-		# figure dimensions
-		fig = plt.figure(figsize=(10,6))
-		ax = fig.add_subplot(1,1,1)
-		
-		# parse NMON date/timestamps and produce datetime objects
-		dates = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.outData[stat][0][1:]]
-		data =self.outData[stat][1][1:]
-		
-		# plot
-		ax.plot_date(dates, data, "-")
-		
-		# format axis
-		ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(10))
-		ax.xaxis.set_major_formatter(mpl.dates.DateFormatter("%m-%d %H:%M:%S"))
-		ax.xaxis.set_minor_locator(mpl.ticker.MaxNLocator(100))
-		ax.autoscale_view()
-		if isPrct:
-			ax.set_ylim([0,100])
-		ax.grid(True)
-
-		fig.autofmt_xdate()
-		ax.set_ylabel("CPU usage in %")
-		ax.set_xlabel("Time")
-		if self.debug:
-			plt.show()
-		else:
-			plt.savefig(os.path.join(self.imgPath,stat+".png"))
 	
 	def processLine(self,header,line):
 		if "AAA" in header:
@@ -116,9 +62,9 @@ class nmonParser:
 		elif "ZZZZ" in header:
 			self.tStamp[line[1]]=line[3]+" "+line[2]
 		else:
-			if line[0] in self.outData.keys():
+			if line[0] in self.processedData.keys():
 				#print "already here"
-				table=self.outData[line[0]]
+				table=self.processedData[line[0]]
 				for n,col in enumerate(table):
 					# line[1] give you the T####
 					if line[n+1] in self.tStamp.keys():
@@ -135,21 +81,32 @@ class nmonParser:
 					tmp=[]
 					tmp.append(h)
 					header.append(tmp)
-				self.outData[line[0]]=header
+				self.processedData[line[0]]=header
 			
-				
 	def parse(self):
 		# TODO: check fname
 		f = open(self.fname,"r")
-		self.rawdata = f.readlines()
-		for l in self.rawdata:
+		rawdata = f.readlines()
+		for l in rawdata:
 			l=l.strip()
 			bits=l.split(',')
 			self.processLine(bits[0],bits)
 
-		# Write out to multiple CSV files
-		for l in self.outData.keys():
-			self.outputCSV(l)
+		return self.processedData
+	
+	def output(self,outType="csv"):
+		if len(self.processedData) <= 0:
+			# nothing has been parsed yet
+			print "Error: output called before parsing"
+			exit()
+			
+		if outType.lower()=="csv":
+			# Write out to multiple CSV files
+			for l in self.processedData.keys():
+				self.outputCSV(l)
+		else:
+			print "Error: output type: %s has not been implemented." % (outType)
+			exit()
 
 		
 
