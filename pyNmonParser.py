@@ -39,16 +39,17 @@ class pyNmonParser:
 	def outputCSV(self, stat):
 		outFile = open(os.path.join(self.outdir,stat+".csv"),"w")
 		line=""
-		# Iterate over each row
-		for n in range(len(self.processedData[stat][0])):
-			line=""
-			# Iterate over each column
-			for col in self.processedData[stat]:
-				if line == "":
-					line+=col[n]
-				else:
-					line+=","+col[n]
-			outFile.write(line+"\n")
+		if len(self.processedData[stat]) > 0:
+			# Iterate over each row
+			for n in range(len(self.processedData[stat][0])):
+				line=""
+				# Iterate over each column
+				for col in self.processedData[stat]:
+					if line == "":
+						line+=col[n]
+					else:
+						line+=","+col[n]
+				outFile.write(line+"\n")
 	
 	def processLine(self,header,line):
 		if "AAA" in header:
@@ -67,9 +68,12 @@ class pyNmonParser:
 				table=self.processedData[line[0]]
 				for n,col in enumerate(table):
 					# line[1] give you the T####
-					if line[n+1] in self.tStamp.keys():
+					if n == 0 and line[n+1] in self.tStamp.keys():
 						# lookup the time stamp in tStamp
 						col.append(self.tStamp[line[n+1]])
+					elif n == 0 and line[n+1] not in self.tStamp.keys():
+						print "Discarding line with missing Timestamp", line
+						break
 					else:
 						# TODO: do parsing(str2float) here
 						col.append(line[n+1])

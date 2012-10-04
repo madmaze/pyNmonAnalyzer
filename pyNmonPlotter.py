@@ -47,16 +47,17 @@ class pyNmonPlotter:
 				values.append((self.processedData["CPU_ALL"][3][1:],"wait"))
 				
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="CPU load (%)", title="CPU vs Time", isPrct=True)
+				self.plotStat(data, xlabel="Time", ylabel="CPU load (%)", title="CPU vs Time", isPrct=True, stacked=True)
 				
 			elif "DISKBUSY" in stat:
 				# parse NMON date/timestamps and produce datetime objects
-				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
-				values=[]
-				values.append((self.processedData["DISKBUSY"][1][1:],self.processedData["CPU_ALL"][1][:1]))
+				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["DISKBUSY"][0][1:]]
 				
+				values=[]
+				values.append((self.processedData["DISKBUSY"][5][1:],self.processedData["DISKBUSY"][5][:1]))
+				print len(times),len(values)
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="Disk Busy (%)", title="Disk Busy vs Time", isPrct=True)
+				self.plotStat(data, xlabel="Time", ylabel="Disk Busy (%)", title="Disk Busy vs Time", yrange=[0,120])
 				
 			elif "MEM" in stat:
 				# parse NMON date/timestamps and produce datetime objects
@@ -68,8 +69,8 @@ class pyNmonPlotter:
 				# used = total - free - buffers - chache
 				total = np.array([float(x) for x in mem[1][1:]])
 				free = np.array([float(x) for x in mem[5][1:]])
-				cache = np.array([float(x) for x in mem[5][1:]])
-				buffers = np.array([float(x) for x in mem[5][1:]])
+				cache = np.array([float(x) for x in mem[10][1:]])
+				buffers = np.array([float(x) for x in mem[13][1:]])
 
 				used = total - free - cache - buffers
 				values.append((used,"used mem"))
@@ -83,7 +84,7 @@ class pyNmonPlotter:
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
 				values=[]
 				# TODO: break this out.. prob default to eth0
-				iface="wlan0"
+				iface="eth0"
 				
 				read=np.array([])
 				write=np.array([])
@@ -100,7 +101,7 @@ class pyNmonPlotter:
 				data=(times,values)
 				self.plotStat(data, xlabel="Time", ylabel="Network KB/s", title="Net vs Time", yrange=[0,max(max(read),max(write))*1.2])
 		
-	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=False, yrange=[0,100]):
+	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=False, yrange=[0,100], stacked=False):
 		
 		# figure dimensions
 		fig = plt.figure(figsize=(12,4))
@@ -109,9 +110,21 @@ class pyNmonPlotter:
 		# retrieve timestamps and datapoints
 		times, values = data 
 		
-		# plot
-		for v,label in values:
-			ax.plot_date(times, v, "-")
+		if stacked:
+			a = np.array([float(x) for x in values[0][0]])
+			b = np.array([float(x) for x in values[1][0]])
+			c = np.array([float(x) for x in values[2][0]])
+			y = np.row_stack((a,b,c))
+			y_ax = np.cumsum(y, axis=0)
+			ax.fill_between(times, 0, y_ax[0,:], facecolor="green")
+			ax.fill_between(times, y_ax[0,:], y_ax[1,:], facecolor="red")
+			ax.fill_between(times, y_ax[1,:], y_ax[2,:], facecolor="blue")
+			#ax.fill_between(times, values[0][0], values[1][0])
+			#ax.fill_between(times, values[1][0], values[2][0])
+		else:
+			# plot
+			for v,label in values:
+				ax.plot_date(times, v, "-")
 		
 		# format axis
 		ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(10))

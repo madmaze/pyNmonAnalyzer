@@ -67,7 +67,7 @@ class pyNmonAnalyzer:
 		print "\nAll done, exiting."
 	
 	def buildReport(self):
-		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, debug=self.args.debug)
+		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, args.outdir, debug=self.args.debug)
 		stdReport = ["CPU","DISKBUSY","MEM","NET"]
 		
 		# TODO implement plotting options
