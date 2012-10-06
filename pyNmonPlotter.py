@@ -25,6 +25,7 @@ import numpy as np
 class pyNmonPlotter:
 	# Holds final 2D arrays of each stat
 	processedData = {}
+	plotCols = {"DISKBUSY":["sda","xvdf"],"NET":["eth0"]}
 	
 	def __init__(self, processedData, outdir="./data/", overwrite=False, debug=False):
 		# TODO: check input vars or "die"
@@ -54,10 +55,15 @@ class pyNmonPlotter:
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["DISKBUSY"][0][1:]]
 				
 				values=[]
-				values.append((self.processedData["DISKBUSY"][5][1:],self.processedData["DISKBUSY"][5][:1]))
-				print len(times),len(values)
+				for i in self.processedData["DISKBUSY"]:
+					colTitle = i[:1][0]
+					for col in self.plotCols["DISKBUSY"]:
+						if col in colTitle:
+							read = np.array([float(x) for x in i[1:]])
+							values.append((read,colTitle))
+				
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="Disk Busy (%)", title="Disk Busy vs Time", yrange=[0,120])
+				self.plotStat(data, xlabel="Time", ylabel="Disk Busy (%)", title="Disk Busy vs Time", yrange=[0,105])
 				
 			elif "MEM" in stat:
 				# parse NMON date/timestamps and produce datetime objects
@@ -83,25 +89,24 @@ class pyNmonPlotter:
 				# parse NMON date/timestamps and produce datetime objects
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
 				values=[]
-				# TODO: break this out.. prob default to eth0
-				iface="eth0"
 				
 				read=np.array([])
 				write=np.array([])
 				for i in self.processedData["NET"]:
 					colTitle = i[:1][0]
-					if iface in colTitle and "read" in colTitle:
-						read = np.array([float(x) for x in i[1:]])
-						values.append((read,colTitle))
-						
-					elif iface in colTitle and "write" in colTitle:
-						write = np.array([float(x) for x in i[1:]])
-						values.append((write,colTitle))
+					for iface in self.plotCols["NET"]:
+						if iface in colTitle and "read" in colTitle:
+							read = np.array([float(x) for x in i[1:]])
+							values.append((read,colTitle))
+							
+						elif iface in colTitle and "write" in colTitle:
+							write = np.array([float(x) for x in i[1:]])
+							values.append((write,colTitle))
 				
 				data=(times,values)
 				self.plotStat(data, xlabel="Time", ylabel="Network KB/s", title="Net vs Time", yrange=[0,max(max(read),max(write))*1.2])
 		
-	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=False, yrange=[0,100], stacked=False):
+	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=False, yrange=[0,105], stacked=False):
 		
 		# figure dimensions
 		fig = plt.figure(figsize=(12,4))
@@ -132,7 +137,7 @@ class pyNmonPlotter:
 		ax.xaxis.set_minor_locator(mpl.ticker.MaxNLocator(100))
 		ax.autoscale_view()
 		if isPrct:
-			ax.set_ylim([0,100])
+			ax.set_ylim([0,105])
 		else:
 			ax.set_ylim(yrange)
 		ax.grid(True)
