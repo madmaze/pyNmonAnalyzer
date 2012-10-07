@@ -29,11 +29,18 @@ class pyNmonPlotter:
 	
 	def __init__(self, processedData, outdir="./data/", overwrite=False, debug=False):
 		# TODO: check input vars or "die"
-		self.imgPath = outdir
+		self.imgPath = os.path.join(outdir,"img")
 		self.debug = debug
 		self.processedData = processedData
+		if not (os.path.exists(self.imgPath)):
+			try:
+				os.makedirs(self.imgPath)
+			except:
+				print "[ERROR] creating results dir:",self.imgPath
+				exit()
 		
 	def plotStats(self, todoList):
+		outFiles=[]
 		if len(todoList) <= 0:
 			print "Error: nothing to plot"
 			exit()
@@ -48,7 +55,8 @@ class pyNmonPlotter:
 				values.append((self.processedData["CPU_ALL"][3][1:],"wait"))
 				
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="CPU load (%)", title="CPU vs Time", isPrct=True, stacked=True)
+				fname = self.plotStat(data, xlabel="Time", ylabel="CPU load (%)", title="CPU vs Time", isPrct=True, stacked=True)
+				outFiles.append(fname)
 				
 			elif "DISKBUSY" in stat:
 				# parse NMON date/timestamps and produce datetime objects
@@ -63,9 +71,11 @@ class pyNmonPlotter:
 							values.append((read,colTitle))
 				
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="Disk Busy (%)", title="Disk Busy vs Time", yrange=[0,105])
+				fname = self.plotStat(data, xlabel="Time", ylabel="Disk Busy (%)", title="Disk Busy vs Time", yrange=[0,105])
+				outFiles.append(fname)
 				
 			elif "MEM" in stat:
+				# TODO: implement using Stacked graphs for this
 				# parse NMON date/timestamps and produce datetime objects
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
 				values=[]
@@ -83,7 +93,8 @@ class pyNmonPlotter:
 				values.append((total,"total mem"))
 				
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="Memory in MB", title="Memory vs Time", isPrct=False, yrange=[0,max(total)*1.2])
+				fname = self.plotStat(data, xlabel="Time", ylabel="Memory in MB", title="Memory vs Time", isPrct=False, yrange=[0,max(total)*1.2])
+				outFiles.append(fname)
 				
 			elif "NET" in stat:
 				# parse NMON date/timestamps and produce datetime objects
@@ -104,7 +115,10 @@ class pyNmonPlotter:
 							values.append((write,colTitle))
 				
 				data=(times,values)
-				self.plotStat(data, xlabel="Time", ylabel="Network KB/s", title="Net vs Time", yrange=[0,max(max(read),max(write))*1.2])
+				fname = self.plotStat(data, xlabel="Time", ylabel="Network KB/s", title="Net vs Time", yrange=[0,max(max(read),max(write))*1.2])
+				outFiles.append(fname)
+		return outFiles
+			
 		
 	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=False, yrange=[0,105], stacked=False):
 		
@@ -116,6 +130,7 @@ class pyNmonPlotter:
 		times, values = data 
 		
 		if stacked:
+			# TODO: parameterize out so that it can be more versitile
 			a = np.array([float(x) for x in values[0][0]])
 			b = np.array([float(x) for x in values[1][0]])
 			c = np.array([float(x) for x in values[2][0]])
@@ -148,5 +163,7 @@ class pyNmonPlotter:
 		if self.debug:
 			plt.show()
 		else:
-			plt.savefig(os.path.join(self.imgPath,title.replace (" ", "_")+".png"))
+			outFilename = os.path.join(self.imgPath,title.replace (" ", "_")+".png")
+			plt.savefig(outFilename)
+			return outFilename
 

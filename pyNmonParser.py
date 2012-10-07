@@ -36,6 +36,7 @@ class pyNmonParser:
 		self.outdir = outdir
 		self.debug = debug
 		
+		
 	def outputCSV(self, stat):
 		outFile = open(os.path.join(self.outdir,stat+".csv"),"w")
 		line=""
@@ -106,11 +107,22 @@ class pyNmonParser:
 		return self.processedData
 	
 	def output(self,outType="csv"):
+		
 		if len(self.processedData) <= 0:
 			# nothing has been parsed yet
 			print "Error: output called before parsing"
 			exit()
-			
+		
+		# make output dir
+		self.outdir = os.path.join(self.outdir,outType)
+		if not (os.path.exists(self.outdir)):
+			try:
+				os.makedirs(self.outdir)
+			except:
+				print "[ERROR] creating results dir:",self.outdir
+				exit()
+				
+		# switch for different output types	
 		if outType.lower()=="csv":
 			# Write out to multiple CSV files
 			for l in self.processedData.keys():

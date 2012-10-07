@@ -18,9 +18,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 from shutil import rmtree 
+import argparse
+
 import pyNmonParser
 import pyNmonPlotter
-import argparse
+import pyNmonReport
 
 class pyNmonAnalyzer:
 	# Holds final 2D arrays of each stat
@@ -72,7 +74,13 @@ class pyNmonAnalyzer:
 		stdReport = ["CPU","DISKBUSY","MEM","NET"]
 		
 		# TODO implement plotting options
-		nmonPlotter.plotStats(stdReport)
+		outFiles = nmonPlotter.plotStats(stdReport)
+		
+		# Build HTML report
+		# TODO: final dir structure
+		#reportName = os.path.join(self.args.outdir,"report.html")
+		pyNmonReport.createReport(outFiles, self.args.outdir)
+			
 		
 	def outputData(self, outputFormat):
 		self.nmonParser.output(outputFormat)
