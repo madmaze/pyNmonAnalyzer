@@ -123,7 +123,9 @@ class pyNmonPlotter:
 	def plotStat(self, data, xlabel="time", ylabel="", title="title", isPrct=False, yrange=[0,105], stacked=False):
 		
 		# figure dimensions
-		fig = plt.figure(figsize=(12,4))
+		fig = plt.figure(figsize=(13,4), frameon=True)
+		# risizing to hack the legend in the right location
+		fig.subplots_adjust(right=.8)
 		ax = fig.add_subplot(1,1,1)
 		
 		# retrieve timestamps and datapoints
@@ -136,15 +138,23 @@ class pyNmonPlotter:
 			c = np.array([float(x) for x in values[2][0]])
 			y = np.row_stack((a,b,c))
 			y_ax = np.cumsum(y, axis=0)
-			ax.fill_between(times, 0, y_ax[0,:], facecolor="green")
-			ax.fill_between(times, y_ax[0,:], y_ax[1,:], facecolor="red")
-			ax.fill_between(times, y_ax[1,:], y_ax[2,:], facecolor="blue")
-			#ax.fill_between(times, values[0][0], values[1][0])
-			#ax.fill_between(times, values[1][0], values[2][0])
+			ax.fill_between(times, 0, y_ax[0,:], facecolor="green", label="usr")
+			ax.fill_between(times, y_ax[0,:], y_ax[1,:], facecolor="red", label="sys")
+			ax.fill_between(times, y_ax[1,:], y_ax[2,:], facecolor="blue", label="wait")
+			
+			# hack for getting around missing legend
+			p1 = plt.Rectangle((0, 0), 1, 1, fc="g")
+			p2 = plt.Rectangle((0, 0), 1, 1, fc="r")
+			p3 = plt.Rectangle((0, 0), 1, 1, fc="b")
+			ax.legend([p1, p2, p3],["usr","sys","wait"], fancybox=True, loc='center left', bbox_to_anchor=(1, 0.5))
+
 		else:
 			# plot
 			for v,label in values:
-				ax.plot_date(times, v, "-")
+				ax.plot_date(times, v, "-", label=label)
+				
+			ax.legend(fancybox=True, loc='center left', bbox_to_anchor=(1, 0.5))
+		
 		
 		# format axis
 		ax.xaxis.set_major_locator(mpl.ticker.MaxNLocator(10))
