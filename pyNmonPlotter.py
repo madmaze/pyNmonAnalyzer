@@ -25,7 +25,7 @@ import numpy as np
 class pyNmonPlotter:
 	# Holds final 2D arrays of each stat
 	processedData = {}
-	plotCols = {"DISKBUSY":["sda","xvdf"],"NET":["eth0"]}
+	plotCols = {"DISKBUSY":["sda1","xvdf1"],"NET":["eth0"]}
 	
 	def __init__(self, processedData, outdir="./data/", overwrite=False, debug=False):
 		# TODO: check input vars or "die"
