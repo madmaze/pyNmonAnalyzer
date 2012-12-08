@@ -25,7 +25,6 @@ import numpy as np
 class pyNmonPlotter:
 	# Holds final 2D arrays of each stat
 	processedData = {}
-	plotCols = {"DISKBUSY":["sda1","xvdf1"],"NET":["eth0"]}
 	
 	def __init__(self, processedData, outdir="./data/", overwrite=False, debug=False):
 		# TODO: check input vars or "die"
@@ -45,7 +44,7 @@ class pyNmonPlotter:
 			print "Error: nothing to plot"
 			exit()
 		
-		for stat in todoList:
+		for stat, fields in todoList:
 			if "CPU" in stat:
 				# parse NMON date/timestamps and produce datetime objects
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
@@ -65,7 +64,7 @@ class pyNmonPlotter:
 				values=[]
 				for i in self.processedData["DISKBUSY"]:
 					colTitle = i[:1][0]
-					for col in self.plotCols["DISKBUSY"]:
+					for col in fields:
 						if col in colTitle:
 							read = np.array([float(x) for x in i[1:]])
 							values.append((read,colTitle))
@@ -105,7 +104,7 @@ class pyNmonPlotter:
 				write=np.array([])
 				for i in self.processedData["NET"]:
 					colTitle = i[:1][0]
-					for iface in self.plotCols["NET"]:
+					for iface in fields:
 						if iface in colTitle and "read" in colTitle:
 							read = np.array([float(x) for x in i[1:]])
 							values.append((read,colTitle))

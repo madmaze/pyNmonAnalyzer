@@ -71,7 +71,8 @@ class pyNmonAnalyzer:
 	
 	def buildReport(self):
 		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, args.outdir, debug=self.args.debug)
-		stdReport = ["CPU","DISKBUSY","MEM","NET"]
+		#stdReport = ["CPU","DISKBUSY","MEM","NET"]
+		stdReport = [("CPU",[]),("DISKBUSY",["sda1","sdb1"]),("MEM",[]),("NET",["eth0"])]
 		
 		# TODO implement plotting options
 		outFiles = nmonPlotter.plotStats(stdReport)
