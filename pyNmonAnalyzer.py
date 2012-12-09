@@ -159,7 +159,7 @@ class pyNmonAnalyzer:
 		self.nmonParser.output(outputFormat)
 		
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with Graphs.")
+	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with graphs, which is configured through report.config.")
 	parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
 	parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
 	parser.add_argument("input_file", default="test.nmon", help="Input NMON file")
