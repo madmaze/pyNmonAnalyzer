@@ -71,15 +71,17 @@ class pyNmonAnalyzer:
 	
 	def buildReport(self):
 		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, args.outdir, debug=self.args.debug)
-		#stdReport = ["CPU","DISKBUSY","MEM","NET"]
+		
+		# TODO: break out these options into a config file or wizard
 		stdReport = [("CPU",[]),("DISKBUSY",["sda1","sdb1"]),("MEM",[]),("NET",["eth0"])]
+		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
+		#       For DISKBUSY and NET please do adjust the collumns you'd like to plot
+		
 		
 		# TODO implement plotting options
 		outFiles = nmonPlotter.plotStats(stdReport)
 		
 		# Build HTML report
-		# TODO: final dir structure
-		#reportName = os.path.join(self.args.outdir,"report.html")
 		pyNmonReport.createReport(outFiles, self.args.outdir)
 			
 		
