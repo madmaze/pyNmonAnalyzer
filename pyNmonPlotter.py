@@ -171,8 +171,8 @@ class pyNmonPlotter:
 		ax.set_xlabel(xlabel)
 		if self.debug:
 			plt.show()
-		else:
-			outFilename = os.path.join(self.imgPath,title.replace (" ", "_")+".png")
-			plt.savefig(outFilename)
-			return outFilename
+		
+		outFilename = os.path.join(self.imgPath,title.replace (" ", "_")+".png")
+		plt.savefig(outFilename)
+		return outFilename
 
