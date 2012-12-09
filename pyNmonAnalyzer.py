@@ -130,15 +130,23 @@ class pyNmonAnalyzer:
 		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
 		#       For DISKBUSY and NET please do adjust the collumns you'd like to plot
 		
-		if os.path.exists("report.config"):
-			reportConfig = self.loadReportConfig()
+		if os.path.exists(self.args.confFname):
+			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
 		else:
-			print "NOTE: looks like no ./report.config exists. I took the liberty of writing one out for you."
-			print "\t processing will continue with default config:\n\t\t",stdReport
-			
 			# TODO: this could be broken out into a wizard or something
-			self.saveReportConfig(stdReport)
-			reportConfig = stdReport
+			print "WARNING: looks like the specified config file(\""+self.args.confFname+"\") does not exist."
+			
+			if os.path.exists("report.config") == False:
+				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
+				
+				if ans.strip().lower() == "y":
+					self.saveReportConfig(stdReport)
+					print "\nwrote default config to report.config"
+			else:
+				print "\nNOTE: you could try using the default config file with: -r report.config"
+				
+			exit()
+			
 		
 		# TODO implement plotting options
 		outFiles = nmonPlotter.plotStats(reportConfig)
@@ -158,6 +166,7 @@ if __name__ == "__main__":
 	parser.add_argument("-o","--output", dest="outdir", default="./data/", help="Output dir for CSV (Default: ./data/)")
 	parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
 	parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
+	parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
 	args = parser.parse_args()
 	
 	nmonAnalyzer=pyNmonAnalyzer(args)
