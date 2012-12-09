@@ -22,16 +22,18 @@ Goals:
 
 Getting started:
 -----
-[Python Nmon Analyzer: moving away from excel macros](http://matthiaslee.com/?q=node/38)
+- [Python Nmon Analyzer: moving away from excel macros](http://matthiaslee.com/?q=node/38)
 
 Usage:
 -----
 ```
-usage: pyNmonAnalyzer.py [-h] [-x] [-d] [-o OUTDIR] [-c] [-b] input_file
+usage: pyNmonAnalyzer.py [-h] [-x] [-d] [-o OUTDIR] [-c] [-b] [-r CONFFNAME]
+                         input_file
 
 nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for
 easier analysis, without the use of the MS Excel Macro. Also included is an
-option to build an HTML report with Graphs.
+option to build an HTML report with graphs, which is configured through
+report.config.
 
 positional arguments:
   input_file            Input NMON file
@@ -44,6 +46,9 @@ optional arguments:
                         Output dir for CSV (Default: ./data/)
   -c, --csv             CSV output? (Default: False)
   -b, --buildReport     report output? (Default: False)
+  -r CONFFNAME, --reportConfig CONFFNAME
+                        Report config file, if none exists: we will write the
+                        default config file out (Default: ./report.config)
 ```
 
 License:
