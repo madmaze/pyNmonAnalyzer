@@ -11,6 +11,7 @@ project is currently a work-in-progress and therefore will hopefully improve in
 functionality and usability. If you find a bug or have feature requests, please do
 file an issues [here](https://github.com/madmaze/pyNmonAnalyzer/issues)
 
+- [Example Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/data/report.html)
 
 
 Goals:
