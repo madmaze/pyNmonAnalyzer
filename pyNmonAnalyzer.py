@@ -27,16 +27,15 @@ import pyNmonReport
 class pyNmonAnalyzer:
 	# Holds final 2D arrays of each stat
 	processedData = {}
-	
-	nmonParser=""
+	nmonParser = None
 	
 	# Holds System Info gathered by nmon
-	sysInfo=[]
-	bbbInfo=[]
-	args=[]
+	sysInfo = []
+	bbbInfo = []
+	args = []
 	
 	def __init__(self, args):
-		self.args=args
+		self.args = args
 		# check ouput dir, if not create
 		if os.path.exists(self.args.outdir) and args.overwrite:
 			try:
@@ -69,17 +68,80 @@ class pyNmonAnalyzer:
 		
 		print "\nAll done, exiting."
 	
+	def saveReportConfig(self, reportConf, configFname="report.config"):
+		# TODO: add some error checking
+		f = open(configFname,"w")
+		header = '''
+# Plotting configuration file.
+# =====
+# please edit this file carefully, generally the CPU and MEM options are left blank
+# 	since there is under the hood calculations going on to plot used vs total mem and 
+#	CPU plots usr/sys/wait for all CPUs on the system
+# Do adjust DISKBUSY and NET to plot the desired data
+#
+# Defaults:
+# CPU=
+# DISKBUSY=sda1,sdb1
+# MEM=
+# NET=eth0
+
+'''
+		f.write(header)
+		for stat, fields in reportConf:
+			line = stat + "="
+			if len(fields) > 0:
+				line += ",".join(fields)
+			line += "\n"
+			f.write(line)
+		f.close()
+	
+	def loadReportConfig(self, configFname="report.config"):
+		# TODO: add some error checking
+		f = open(configFname, "r")
+		reportConfig = []
+		
+		# loop over all lines
+		for l in f:
+			l = l.strip()
+			stat=""
+			fields = []
+			# ignore lines beginning with #
+			if l[0:1] != "#":
+				bits = l.split("=")
+				# check whether we have the right number of elements
+				if len(bits) == 2:
+					stat = bits[0]
+					if bits[1] != "":
+						fields = bits[1].split(",")
+						
+					if self.args.debug:
+						print stat, fields
+						
+					# add to config
+					reportConfig.append((stat,fields))
+					
+		f.close()
+		return reportConfig
+	
 	def buildReport(self):
 		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, args.outdir, debug=self.args.debug)
 		
-		# TODO: break out these options into a config file or wizard
 		stdReport = [("CPU",[]),("DISKBUSY",["sda1","sdb1"]),("MEM",[]),("NET",["eth0"])]
 		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
 		#       For DISKBUSY and NET please do adjust the collumns you'd like to plot
 		
+		if os.path.exists("report.config"):
+			reportConfig = self.loadReportConfig()
+		else:
+			print "NOTE: looks like no ./report.config exists. I took the liberty of writing one out for you."
+			print "\t processing will continue with default config:\n\t\t",stdReport
+			
+			# TODO: this could be broken out into a wizard or something
+			self.saveReportConfig(stdReport)
+			reportConfig = stdReport
 		
 		# TODO implement plotting options
-		outFiles = nmonPlotter.plotStats(stdReport)
+		outFiles = nmonPlotter.plotStats(reportConfig)
 		
 		# Build HTML report
 		pyNmonReport.createReport(outFiles, self.args.outdir)
@@ -89,7 +151,7 @@ class pyNmonAnalyzer:
 		self.nmonParser.output(outputFormat)
 		
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with Graphs")
+	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with Graphs.")
 	parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
 	parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
 	parser.add_argument("input_file", default="test.nmon", help="Input NMON file")
