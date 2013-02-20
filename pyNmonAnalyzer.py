@@ -34,8 +34,30 @@ class pyNmonAnalyzer:
 	bbbInfo = []
 	args = []
 	
+	stdReport = [("CPU",[]),("DISKBUSY",["sda1","sdb1"]),("MEM",[]),("NET",["eth0"])]
+	
 	def __init__(self, args):
 		self.args = args
+		if self.args.defaultConf:
+			# write out default report and exit
+			print "Note: writing default report config file to",self.args.confFname
+			self.saveReportConfig(self.stdReport)
+			exit()
+		
+		if self.args.buildReport:
+			# check whether specified report config exists
+			if os.path.exists("report.config") == False:
+				print "WARNING: looks like the specified config file(\""+self.args.confFname+"\") does not exist."
+				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
+				
+				if ans.strip().lower() == "y":
+					self.saveReportConfig(self.stdReport)
+					print "\nwrote default config to report.config"
+					print "Please adjust report.config to ensure the correct devices will be graphed."
+				else:
+					print "\nNOTE: you could try using the default config file with: -r report.config"
+				exit()
+		
 		# check ouput dir, if not create
 		if os.path.exists(self.args.outdir) and args.overwrite:
 			try:
@@ -125,14 +147,16 @@ class pyNmonAnalyzer:
 	
 	def buildReport(self):
 		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, args.outdir, debug=self.args.debug)
-		
-		stdReport = [("CPU",[]),("DISKBUSY",["sda1","sdb1"]),("MEM",[]),("NET",["eth0"])]
+				
 		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
 		#       For DISKBUSY and NET please do adjust the collumns you'd like to plot
 		
 		if os.path.exists(self.args.confFname):
 			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
 		else:
+			print "something went wrong.. looks like %s disappeared while pyNmonAnalyzer was running" % (self.args.confFname)
+			exit()
+			'''
 			# TODO: this could be broken out into a wizard or something
 			print "WARNING: looks like the specified config file(\""+self.args.confFname+"\") does not exist."
 			
@@ -140,12 +164,12 @@ class pyNmonAnalyzer:
 				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
 				
 				if ans.strip().lower() == "y":
-					self.saveReportConfig(stdReport)
+					self.saveReportConfig(self.stdReport)
 					print "\nwrote default config to report.config"
 			else:
 				print "\nNOTE: you could try using the default config file with: -r report.config"
 				
-			exit()
+			exit()'''
 			
 		
 		# TODO implement plotting options
@@ -162,11 +186,12 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with graphs, which is configured through report.config.")
 	parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
 	parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
-	parser.add_argument("input_file", default="test.nmon", help="Input NMON file")
+	parser.add_argument("-i","--inputfile",dest="input_file", default="test.nmon", help="Input NMON file")
 	parser.add_argument("-o","--output", dest="outdir", default="./data/", help="Output dir for CSV (Default: ./data/)")
 	parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
 	parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
 	parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
+	parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
 	args = parser.parse_args()
 	
 	nmonAnalyzer=pyNmonAnalyzer(args)

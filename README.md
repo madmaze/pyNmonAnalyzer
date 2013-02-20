@@ -28,21 +28,20 @@ Getting started:
 Usage:
 -----
 ```
-usage: pyNmonAnalyzer.py [-h] [-x] [-d] [-o OUTDIR] [-c] [-b] [-r CONFFNAME]
-                         input_file
+usage: pyNmonAnalyzer.py [-h] [-x] [-d] [-i INPUT_FILE] [-o OUTDIR] [-c] [-b]
+                         [-r CONFFNAME] [--defaultConfig]
 
 nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for
 easier analysis, without the use of the MS Excel Macro. Also included is an
 option to build an HTML report with graphs, which is configured through
 report.config.
 
-positional arguments:
-  input_file            Input NMON file
-
 optional arguments:
   -h, --help            show this help message and exit
   -x, --overwrite       overwrite existing results (Default: False)
   -d, --debug           debug? (Default: False)
+  -i INPUT_FILE, --inputfile INPUT_FILE
+                        Input NMON file
   -o OUTDIR, --output OUTDIR
                         Output dir for CSV (Default: ./data/)
   -c, --csv             CSV output? (Default: False)
@@ -50,10 +49,19 @@ optional arguments:
   -r CONFFNAME, --reportConfig CONFFNAME
                         Report config file, if none exists: we will write the
                         default config file out (Default: ./report.config)
+  --defaultConfig       Write out a default config file
 ```
 
+Example Usage:
+-------------
+Build HTML report with graphs for test.nmon and store results to testReport
+$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon
+
+Compile CSV formatted tables for data in test.nmon and store results to testOut
+$> ./pyNmonAnalyzer.py -c -o testOut -i test.nmon
+
 License:
---------
+-------
 ```
 Copyright (c) 2012 Matthias Lee, matthias.a.lee[]gmail.com
 Last edited: Sept 25th 2012
