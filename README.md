@@ -54,11 +54,11 @@ optional arguments:
 
 Example Usage:
 -------------
-Build HTML report with graphs for test.nmon and store results to testReport
-$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon
+Build HTML report with graphs for test.nmon and store results to testReport  
+```$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon```
 
-Compile CSV formatted tables for data in test.nmon and store results to testOut
-$> ./pyNmonAnalyzer.py -c -o testOut -i test.nmon
+Compile CSV formatted tables for data in test.nmon and store results to testOut  
+```$> ./pyNmonAnalyzer.py -c -o testOut -i test.nmon```
 
 License:
 -------
