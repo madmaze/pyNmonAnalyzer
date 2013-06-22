@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
+import sys
 from shutil import rmtree 
 import argparse
 
@@ -194,5 +195,10 @@ if __name__ == "__main__":
 	parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
 	args = parser.parse_args()
 	
-	nmonAnalyzer=pyNmonAnalyzer(args)
+	if len(sys.argv) == 1:
+		# no arguments specified
+		parser.print_help()
+		exit()
+	
+	nmonAnalyzer = pyNmonAnalyzer(args)
 	
