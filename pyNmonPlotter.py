@@ -17,10 +17,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import datetime
 import numpy as np
+
+import matplotlib as mpl
+# If no display is attached it will fail to plot and save figures.. so lets check 
+#  If we are now using the Agg backend, we cannot display to screen, so toggle "show" for debug
+if 'DISPLAY' in os.environ.keys() and os.environ['DISPLAY'] != "":
+	try:
+		mpl.use("TkAgg")
+	except:
+		print 'problem using TkAgg, check whether you have an attached display, else force mpl.use("Agg")'
+else:
+	mpl.use("Agg")
+	AggOnly = True
+	
+import matplotlib.pyplot as plt
+
 
 class pyNmonPlotter:
 	# Holds final 2D arrays of each stat
@@ -170,7 +183,10 @@ class pyNmonPlotter:
 		ax.set_ylabel(ylabel)
 		ax.set_xlabel(xlabel)
 		if self.debug:
-			plt.show()
+			if not AggOnly:
+				plt.show()
+			else:
+				print "cant .show() when using the Agg backend"
 		
 		outFilename = os.path.join(self.imgPath,title.replace (" ", "_")+".png")
 		plt.savefig(outFilename)
