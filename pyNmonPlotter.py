@@ -31,6 +31,7 @@ if 'DISPLAY' in os.environ.keys() and os.environ['DISPLAY'] != "":
 else:
 	mpl.use("Agg")
 	AggOnly = True
+	print "Note: using failsafe backend, Agg"
 	
 import matplotlib.pyplot as plt
 
