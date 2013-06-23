@@ -20,6 +20,7 @@ import os
 import sys
 from shutil import rmtree 
 import argparse
+import logging as log
 
 import pyNmonParser
 import pyNmonPlotter
@@ -41,22 +42,22 @@ class pyNmonAnalyzer:
 		self.args = args
 		if self.args.defaultConf:
 			# write out default report and exit
-			print "Note: writing default report config file to",self.args.confFname
+			log.warn("Note: writing default report config file to", self.args.confFname)
 			self.saveReportConfig(self.stdReport)
 			exit()
 		
 		if self.args.buildReport:
 			# check whether specified report config exists
 			if os.path.exists("report.config") == False:
-				print "WARNING: looks like the specified config file(\""+self.args.confFname+"\") does not exist."
+				log.warn("looks like the specified config file(\""+self.args.confFname+"\") does not exist.")
 				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
 				
 				if ans.strip().lower() == "y":
 					self.saveReportConfig(self.stdReport)
-					print "\nwrote default config to report.config"
-					print "Please adjust report.config to ensure the correct devices will be graphed."
+					log.warn("Wrote default config to report.config.")
+					log.warn("Please adjust report.config to ensure the correct devices will be graphed.")
 				else:
-					print "\nNOTE: you could try using the default config file with: -r report.config"
+					log.warn("\nNOTE: you could try using the default config file with: -r report.config")
 				exit()
 		
 		# check ouput dir, if not create
@@ -64,18 +65,18 @@ class pyNmonAnalyzer:
 			try:
 				rmtree(self.args.outdir)
 			except:
-				print "[ERROR] removing old dir:",self.args.outdir
+				log.error("Removing old dir:",self.args.outdir)
 				exit()
 				
 		elif os.path.exists(self.args.outdir):
-			print "[ERROR] results directory already exists, please remove or use '-x' to overwrite"
+			log.error("Results directory already exists, please remove or use '-x' to overwrite")
 			exit()
 			
 		# Create results path if not existing
 		try:
 			os.makedirs(self.args.outdir)
 		except:
-			print "[ERROR] creating results dir:",self.args.outdir
+			log.error("Creating results dir:", self.args.outdir)
 			exit()
 		
 		# This is where the magic begins
@@ -83,13 +84,13 @@ class pyNmonAnalyzer:
 		self.processedData = self.nmonParser.parse()
 		
 		if self.args.outputCSV:
-			print "Preparing CSV files.."
+			log.info("Preparing CSV files..")
 			self.outputData("csv")
 		if self.args.buildReport:
-			print "Preparing graphs.."
+			log.info("Preparing graphs..")
 			self.buildReport()
 		
-		print "\nAll done, exiting."
+		log.info("All done, exiting.")
 	
 	def saveReportConfig(self, reportConf, configFname="report.config"):
 		# TODO: add some error checking
@@ -138,7 +139,7 @@ class pyNmonAnalyzer:
 						fields = bits[1].split(",")
 						
 					if self.args.debug:
-						print stat, fields
+						log.debug("%s %s" % (stat, fields))
 						
 					# add to config
 					reportConfig.append((stat,fields))
@@ -155,23 +156,8 @@ class pyNmonAnalyzer:
 		if os.path.exists(self.args.confFname):
 			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
 		else:
-			print "something went wrong.. looks like %s disappeared while pyNmonAnalyzer was running" % (self.args.confFname)
-			exit()
-			'''
-			# TODO: this could be broken out into a wizard or something
-			print "WARNING: looks like the specified config file(\""+self.args.confFname+"\") does not exist."
-			
-			if os.path.exists("report.config") == False:
-				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
-				
-				if ans.strip().lower() == "y":
-					self.saveReportConfig(self.stdReport)
-					print "\nwrote default config to report.config"
-			else:
-				print "\nNOTE: you could try using the default config file with: -r report.config"
-				
-			exit()'''
-			
+			log.error("something went wrong.. looks like %s disappeared while pyNmonAnalyzer was running" % (self.args.confFname))
+			exit()			
 		
 		# TODO implement plotting options
 		outFiles = nmonPlotter.plotStats(reportConfig)
@@ -188,11 +174,12 @@ if __name__ == "__main__":
 	parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
 	parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
 	parser.add_argument("-i","--inputfile",dest="input_file", default="test.nmon", help="Input NMON file")
-	parser.add_argument("-o","--output", dest="outdir", default="./data/", help="Output dir for CSV (Default: ./data/)")
+	parser.add_argument("-o","--output", dest="outdir", default="./report/", help="Output dir for CSV (Default: ./report/)")
 	parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
 	parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
 	parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
 	parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
+	parser.add_argument("-l","--log",dest="logLevel", default="INFO", help="Logging verbosity, use DEBUG for more output and showing graphs (Default: INFO)")
 	args = parser.parse_args()
 	
 	if len(sys.argv) == 1:
@@ -200,5 +187,13 @@ if __name__ == "__main__":
 		parser.print_help()
 		exit()
 	
+	logLevel = getattr(log, args.logLevel.upper())
+	if logLevel is None:
+		print "ERROR: Invalid logLevel:", args.loglevel
+		exit()
+	if args.debug:
+		log.basicConfig(level=logLevel, format='%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s')
+	else:
+		log.basicConfig(level=logLevel, format='%(levelname)s - %(message)s')
 	nmonAnalyzer = pyNmonAnalyzer(args)
 	

@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import datetime
+import logging as log
 
 htmlheader='''<html>
 <head><title>pyNmonReport %s </title></head>
@@ -27,13 +28,16 @@ htmlheader='''<html>
 	
 def createReport(outFiles, outPath, fname="report.html"):
 	reportPath = os.path.join(outPath,fname)
-	report = open(reportPath, "w")
+	try:
+		report = open(reportPath, "w")
+	except:
+		log.error("Could not open report file!")
+		exit()
 	
 	# write out the html header
 	report.write(htmlheader)
 	
 	for f in outFiles:
-		#print os.path.relpath(f,outPath)
 		report.write('''	<tr>
 		<td><br /><br />
 		<b><center>%s</center></b><br />

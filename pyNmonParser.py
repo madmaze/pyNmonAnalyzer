@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import os
+import logging as log
 
 class pyNmonParser:
 	fname = ""
@@ -65,7 +66,6 @@ class pyNmonParser:
 			self.tStamp[line[1]]=line[3]+" "+line[2]
 		else:
 			if line[0] in self.processedData.keys():
-				#print "already here"
 				table=self.processedData[line[0]]
 				for n,col in enumerate(table):
 					# line[1] give you the T####
@@ -73,7 +73,7 @@ class pyNmonParser:
 						# lookup the time stamp in tStamp
 						col.append(self.tStamp[line[n+1]])
 					elif n == 0 and line[n+1] not in self.tStamp.keys():
-						print "Discarding line with missing Timestamp", line
+						log.warn("Discarding line with missing Timestamp %s" % line)
 						break
 					else:
 						# TODO: do parsing(str2float) here
@@ -110,7 +110,7 @@ class pyNmonParser:
 		
 		if len(self.processedData) <= 0:
 			# nothing has been parsed yet
-			print "Error: output called before parsing"
+			log.error("Output called before parsing")
 			exit()
 		
 		# make output dir
@@ -119,7 +119,7 @@ class pyNmonParser:
 			try:
 				os.makedirs(self.outdir)
 			except:
-				print "[ERROR] creating results dir:",self.outdir
+				log.error("Creating results dir:",self.outdir)
 				exit()
 				
 		# switch for different output types	
@@ -128,7 +128,7 @@ class pyNmonParser:
 			for l in self.processedData.keys():
 				self.outputCSV(l)
 		else:
-			print "Error: output type: %s has not been implemented." % (outType)
+			log.error("Output type: %s has not been implemented." % (outType))
 			exit()
 
 		

@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import datetime
 import numpy as np
+import logging as log
 
 import matplotlib as mpl
 # If no display is attached it will fail to plot and save figures.. so lets check 
@@ -26,12 +27,13 @@ import matplotlib as mpl
 if 'DISPLAY' in os.environ.keys() and os.environ['DISPLAY'] != "":
 	try:
 		mpl.use("TkAgg")
+		AggOnly = False
 	except:
-		print 'problem using TkAgg, check whether you have an attached display, else force mpl.use("Agg")'
+		log.error('problem using TkAgg, check whether you have an attached display, else force mpl.use("Agg")')
 else:
 	mpl.use("Agg")
 	AggOnly = True
-	print "Note: using failsafe backend, Agg"
+	log.info("Note: using failsafe backend, Agg")
 	
 import matplotlib.pyplot as plt
 
@@ -49,13 +51,13 @@ class pyNmonPlotter:
 			try:
 				os.makedirs(self.imgPath)
 			except:
-				print "[ERROR] creating results dir:",self.imgPath
+				log.error("Creating results dir:",self.imgPath)
 				exit()
 		
 	def plotStats(self, todoList):
 		outFiles=[]
 		if len(todoList) <= 0:
-			print "Error: nothing to plot"
+			log.error("Nothing to plot")
 			exit()
 		
 		for stat, fields in todoList:
@@ -187,7 +189,7 @@ class pyNmonPlotter:
 			if not AggOnly:
 				plt.show()
 			else:
-				print "cant .show() when using the Agg backend"
+				log.error("cant .show() when using the Agg backend")
 		
 		outFilename = os.path.join(self.imgPath,title.replace (" ", "_")+".png")
 		plt.savefig(outFilename)
