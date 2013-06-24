@@ -1,0 +1,91 @@
+<html>
+<head>
+<script type="text/javascript"
+  src="http://dygraphs.com/dygraph-dev.js"></script>
+</head>
+<body>
+<div id="plot0"  style="width:1000px; height:300px;"></div> <br>
+<div id="plot1"  style="width:1000px; height:300px;"></div>
+<script type="text/javascript">
+function setVisByColumnHeading(g, headings, labels){
+	vis=[]
+	// remove timestamp column
+	headings.splice(0,1);
+	
+	// figure out which columns we do and do not want
+	for( i in headings){
+		if(labels.indexOf(headings[i]) >= 0){
+			vis.push(true);
+		} else {
+			vis.push(false);
+		}
+	}
+	
+	// Update options
+	g.updateOptions({
+		visibility:vis
+	});
+}
+
+  var dataSources=[
+  	  [__dataSources__]
+  ];
+  
+  var specialOpts=[
+  	  [__specialOpts__]
+  ];
+  
+  var displayCols=[
+  	  [__displayCols__]
+  ];
+
+  gs = [];
+  var blockRedraw = false;
+  
+  for( x in dataSources){
+  	  console.log("creating.. "+dataSources[x]);
+	  gs.push(new Dygraph(
+	    document.getElementById("plot"+x),
+	    dataSources[x], // path to CSV file
+	    {
+	    rollPeriod: 2,
+	    showRoller: false,
+	    stackedGraph: true,
+	    legend: 'always',
+	    labelsDivStyles: { 'textAlign': 'right' },
+	    showRangeSelector: true,
+	    rangeSelectorHeight: 50,
+	    rangeSelectorPlotStrokeColor: 'black',
+	    rangeSelectorPlotFillColor: 'gray',
+	    drawCallback: function(me, initial) {
+				if (blockRedraw){
+				    return;
+			       }
+				blockRedraw = true;
+				if(initial) {
+					console.log("Initial.. " + gs.length);
+					   for (var i = 0; i < gs.length; i++) {
+						    if(gs[i] == me){
+							    setVisByColumnHeading(gs[i], gs[i].getLabels(), displayCols[i]);
+							    gs[i].updateOptions(specialOpts[i]);
+						    }
+					    }
+					blockRedraw = false;
+					return;
+				}
+				var range = me.xAxisRange();
+				for (var j = 0; j < gs.length; j++) {
+					if (gs[j] == me) continue;
+					gs[j].updateOptions( {
+						dateWindow: range
+						} );
+				}
+				blockRedraw = false;
+		      }
+	    } // options
+	  )
+	 );
+  }
+</script>
+</body>
+</html>

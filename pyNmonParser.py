@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import logging as log
+import datetime
 
 class pyNmonParser:
 	fname = ""
@@ -48,7 +49,13 @@ class pyNmonParser:
 				# Iterate over each column
 				for col in self.processedData[stat]:
 					if line == "":
-						line+=col[n]
+						# expecting first column to be date times
+						if n == 0:
+							# skip headings
+							line+=col[n]
+						else:
+							tstamp = datetime.datetime.strptime(col[n], "%d-%b-%Y %H:%M:%S")
+							line += tstamp.strftime("%Y-%m-%d %H:%M:%S")
 					else:
 						line+=","+col[n]
 				outFile.write(line+"\n")
