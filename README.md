@@ -6,12 +6,14 @@ Nmon puts out a long file with a system-info header at the beginning, followed
 by a continuous stream of time stamped readings. This format makes it difficult
 for analysis by standard Spreadsheet viewers without a fair amount of preprocessing.
 The pyNmonAnalyzer aims to make this simpler, faster and more effective. In one
-sweep the pyNmonAnalyzer creates CSV files and an HTML report with graphs. This 
+sweep the pyNmonAnalyzer creates CSV files and two HTML-based reports, one with static 
+graphs and one with interactive graphs powered by [dygraphs](http://dygraphs.com). This 
 project is currently a work-in-progress and therefore will hopefully improve in 
-functionality and usability. If you find a bug or have feature requests, please do
+functionality and usability. If you have questions, find a bug or have feature requests, please do
 file an issues [here](https://github.com/madmaze/pyNmonAnalyzer/issues)
 
 - [Example Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/data/report.html)
+- [Example Advanced Report](matthiaslee.com/scratch/pyNmonAnalyzer/interactiveReport.html)
 
 
 Goals:
@@ -19,7 +21,7 @@ Goals:
 - make nmon log file analysis easier and faster
 - create HTML based reports with embedded graphs
 - create CSV files for more indepth data analysis
-- (way off in the future) interactive graphs for hands on analysis, perhaps using dygraph.js
+- interactive graphs for hands on analysis, perhaps using dygraph.js
 
 Getting started:
 -----
@@ -43,13 +45,18 @@ optional arguments:
   -i INPUT_FILE, --inputfile INPUT_FILE
                         Input NMON file
   -o OUTDIR, --output OUTDIR
-                        Output dir for CSV (Default: ./data/)
+                        Output dir for CSV (Default: ./report/)
   -c, --csv             CSV output? (Default: False)
   -b, --buildReport     report output? (Default: False)
+  --buildInteractiveReport
+                        Compile interactive report? (Default: False)
   -r CONFFNAME, --reportConfig CONFFNAME
                         Report config file, if none exists: we will write the
                         default config file out (Default: ./report.config)
   --defaultConfig       Write out a default config file
+  -l LOGLEVEL, --log LOGLEVEL
+                        Logging verbosity, use DEBUG for more output and
+                        showing graphs (Default: INFO)
 ```
 
 Example Usage:
