@@ -13,7 +13,7 @@ functionality and usability. If you have questions, find a bug or have feature r
 file an issues [here](https://github.com/madmaze/pyNmonAnalyzer/issues)
 
 - [Example Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/data/report.html)
-- [Example Advanced Report](matthiaslee.com/scratch/pyNmonAnalyzer/interactiveReport.html)
+- [Example Advanced Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/interactiveReport.html)
 
 
 Goals:
@@ -61,6 +61,9 @@ optional arguments:
 
 Example Usage:
 -------------
+Build HTML report with *interactive* graphs for test.nmon and store results to testReport  
+```$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon```
+
 Build HTML report with graphs for test.nmon and store results to testReport  
 ```$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon```
 
@@ -70,8 +73,8 @@ Compile CSV formatted tables for data in test.nmon and store results to testOut
 License:
 -------
 ```
-Copyright (c) 2012 Matthias Lee, matthias.a.lee[]gmail.com
-Last edited: Sept 25th 2012
+Copyright (c) 2012-2013 Matthias Lee, matthias.a.lee[]gmail.com
+Last edited: June 24th 2013
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
