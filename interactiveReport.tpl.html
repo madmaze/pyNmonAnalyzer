@@ -38,7 +38,7 @@ function setVisByColumnHeading(g, headings, labels){
   	  [__displayCols__]
   ];
 
-  gs = [];
+  var gs = [];
   var blockRedraw = false;
   
   for( x in dataSources){
@@ -49,7 +49,6 @@ function setVisByColumnHeading(g, headings, labels){
 	    {
 	    rollPeriod: 2,
 	    showRoller: false,
-	    stackedGraph: true,
 	    legend: 'always',
 	    labelsDivStyles: { 'textAlign': 'right' },
 	    showRangeSelector: true,

@@ -135,17 +135,33 @@ class pyNmonAnalyzer:
 			# ignore lines beginning with #
 			if l[0:1] != "#":
 				bits = l.split("=")
+				
 				# check whether we have the right number of elements
 				if len(bits) == 2:
+					# interactive/dygraph report options
+					optStart=-1
+					optEnd=-1
+					if ("{" in bits[1]) != ("}" in bits[1]):
+						log.error("Failed to parse, {..} mismatch")
+					elif "{" in bits[1] and "}" in bits[1]:
+						optStart=bits[1].find("{")+1
+						optEnd=bits[1].rfind("}")
+						plotOpts=bits[1][optStart:optEnd].strip()
+					else:
+						plotOpts = ""
+						
 					stat = bits[0]
 					if bits[1] != "":
-						fields = bits[1].split(",")
+						if optStart != -1:
+							fields = bits[1][:optStart-1].split(",")
+						else:
+							fields = bits[1].split(",")
 						
 					if self.args.debug:
 						log.debug("%s %s" % (stat, fields))
 						
 					# add to config
-					reportConfig.append((stat,fields))
+					reportConfig.append((stat,fields,plotOpts))
 					
 		f.close()
 		return reportConfig

@@ -100,7 +100,18 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 			displayCols.append(headings)
 			localMin = (0.0 if localMin==None else localMin)
 			localMax = (0.0 if localMax==None else localMax)
-			specialOpts.append(('valueRange', [str(0.0), str(localMax*1.05)]))
+			
+			if k[0] in ["CPU_ALL","DISKBUSY"]:
+				# its a prct so FORCE range 0-105
+				localMin=0.0
+				localMax=105.0
+			
+			# bring in opts from config
+			if k[2] != "":
+				localOpts = ",\n".join([k[2],'valueRange: [%f, %f]' % (0.0, localMax*1.05)])
+			else:
+				localOpts = 'valueRange: [%f, %f]' % (0.0, localMax*1.05)
+			specialOpts.append((localOpts))
 			
 			# get min/max of columns
 			#for h in headings:
@@ -110,7 +121,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 		if "[__plots__]" in l:
 			line = ""
 			for i in range(len(dataSources)):
-				line += '<div id="plot' + str(i) + '"  style="width:1000px; height:300px;"></div> </ br> \n'
+				line += '<h2>'+reportConfig[i][0]+'</h2></ br>\n <div id="plot' + str(i) + '"  style="width:1000px; height:300px;"></div> </ br></ br> \n'
 		elif "[__dataSources__]" in l:
 			line = ""
 			for s in dataSources:
@@ -118,14 +129,16 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 					line += '"'+s+'"'
 				else:
 					line += ',\n"'+s+'"'
+					
 		elif "[__specialOpts__]" in l:
 			line = ""
-			for s,v in specialOpts:
-				print s,v
+			for s in specialOpts:
+				print s
 				if line == "":
-					line += '{' + s + ': [' + ','.join(v) + ']}'
+					line += '{' + s + '}'
 				else:
-					line += ',\n{' + s + ': [' + ','.join(v) + ']}'
+					line += ',\n{' + s + '}'
+					
 		elif "[__displayCols__]" in l:
 			line = ""
 			for s in displayCols:
@@ -133,6 +146,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 					line += '["' + '","'.join(s) + '"]'
 				else:
 					line += ',\n["' + '","'.join(s) + '"]'
+					
 		else:
 			line = l
 					
