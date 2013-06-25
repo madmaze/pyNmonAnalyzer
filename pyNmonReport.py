@@ -118,7 +118,9 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 			#	print max(data[k[0]][h])
 	
 	for l in tplFile:
-		if "[__plots__]" in l:
+		if "[__datetime__]" in l:
+			line = l.replace("[__datetime__]", str(datetime.datetime.now()))
+		elif "[__plots__]" in l:
 			line = ""
 			for i in range(len(dataSources)):
 				line += '<h2>'+reportConfig[i][0]+'</h2></ br>\n <div id="plot' + str(i) + '"  style="width:1000px; height:300px;">loading...</div> </ br></ br> \n'
