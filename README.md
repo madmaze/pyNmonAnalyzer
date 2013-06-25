@@ -62,7 +62,7 @@ optional arguments:
 Example Usage:
 -------------
 Build HTML report with *interactive* graphs for test.nmon and store results to testReport  
-```$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon```
+```$> ./pyNmonAnalyzer.py --buildInteractiveReport -o testReport -i test.nmon```
 
 Build HTML report with graphs for test.nmon and store results to testReport  
 ```$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon```
