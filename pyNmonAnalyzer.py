@@ -36,7 +36,7 @@ class pyNmonAnalyzer:
 	bbbInfo = []
 	args = []
 	
-	stdReport = [("CPU",[]),("DISKBUSY",["sda1","sdb1"]),("MEM",[]),("NET",["eth0"])]
+	stdReport = [("CPU",["user","sys","wait"]),("DISKBUSY",["sda1","sdb1"]),("MEM",["memtotal","active"]),("NET",["eth0"])]
 	
 	def __init__(self, args):
 		self.args = args
@@ -107,10 +107,10 @@ class pyNmonAnalyzer:
 # Do adjust DISKBUSY and NET to plot the desired data
 #
 # Defaults:
-# CPU=
-# DISKBUSY=sda1,sdb1
-# MEM=
-# NET=eth0
+# CPU_ALL=user,sys,wait{stackedGraph: true, fillGraph: true}
+# DISKBUSY=sda1,sdb1{}
+# MEM=memtotal,active{}
+# NET=eth0{}
 
 '''
 		f.write(header)

@@ -60,7 +60,7 @@ class pyNmonPlotter:
 			log.error("Nothing to plot")
 			exit()
 		
-		for stat, fields in todoList:
+		for stat, fields, plotOpts in todoList:
 			if "CPU" in stat:
 				# parse NMON date/timestamps and produce datetime objects
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
