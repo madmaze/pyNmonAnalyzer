@@ -36,13 +36,13 @@ class pyNmonAnalyzer:
 	bbbInfo = []
 	args = []
 	
-	stdReport = [("CPU",["user","sys","wait"]),("DISKBUSY",["sda1","sdb1"]),("MEM",["memtotal","active"]),("NET",["eth0"])]
+	stdReport = [('CPU_ALL', ['user', 'sys', 'wait'], 'stackedGraph: true, fillGraph: true'), ('DISKBUSY', ['sda1', 'sdb1'], ''), ('MEM', ['memtotal', 'active'], ''), ('NET', ['eth0'], '')]
 	
 	def __init__(self, args):
 		self.args = args
 		if self.args.defaultConf:
 			# write out default report and exit
-			log.warn("Note: writing default report config file to", self.args.confFname)
+			log.warn("Note: writing default report config file to " + self.args.confFname)
 			self.saveReportConfig(self.stdReport)
 			exit()
 		
@@ -114,11 +114,11 @@ class pyNmonAnalyzer:
 
 '''
 		f.write(header)
-		for stat, fields in reportConf:
+		for stat, fields, plotOpts in reportConf:
 			line = stat + "="
 			if len(fields) > 0:
 				line += ",".join(fields)
-			line += "\n"
+			line += "{%s}\n" % plotOpts
 			f.write(line)
 		f.close()
 	
@@ -175,7 +175,7 @@ class pyNmonAnalyzer:
 		if os.path.exists(self.args.confFname):
 			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
 		else:
-			log.error("something went wrong.. looks like %s disappeared while pyNmonAnalyzer was running" % (self.args.confFname))
+			log.error("something went wrong.. looks like %s is missing. run --defaultConfig to generate a template" % (self.args.confFname))
 			exit()			
 		
 		# TODO implement plotting options
@@ -191,7 +191,7 @@ class pyNmonAnalyzer:
 		if os.path.exists(self.args.confFname):
 			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
 		else:
-			log.error("something went wrong.. looks like %s disappeared while pyNmonAnalyzer was running" % (self.args.confFname))
+			log.error("something went wrong.. looks like %s is missing. run --defaultConfig to generate a template" % (self.args.confFname))
 			exit()			
 
 		# Build interactive HTML report using dygraphs
