@@ -61,6 +61,9 @@ optional arguments:
 
 Example Usage:
 -------------
+First generate a report config, most likely the default is all you need. This creates ./report.config
+```$> ./pyNmonAnalyzer.py --defaultConfig```
+
 Build HTML report with *interactive* graphs for test.nmon and store results to testReport  
 ```$> ./pyNmonAnalyzer.py --buildInteractiveReport -o testReport -i test.nmon```
 
