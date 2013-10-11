@@ -77,7 +77,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 	relpath="csv"
 	for k in reportConfig:
 		# check path relative to us running
-		print k
+		log.debug(k)
 		candidatePath=os.path.join(basepath,k[0]+".csv")
 		if os.path.exists(candidatePath):
 			# add path relative to where the output is
@@ -135,7 +135,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 		elif "[__specialOpts__]" in l:
 			line = ""
 			for s in specialOpts:
-				print s
+				log.debug(s)
 				if line == "":
 					line += '{' + s + '}'
 				else:
