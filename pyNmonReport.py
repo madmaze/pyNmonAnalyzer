@@ -52,7 +52,7 @@ def createReport(outFiles, outPath, fname="report.html"):
 ''')
 	report.close()
 
-def createInteractiveReport(reportConfig, outPath, data=None, fname="interactiveReport.html", templateFile="interactiveReport.tpl.html"):
+def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http://dygraphs.com/dygraph-dev.js",fname="interactiveReport.html", templateFile="interactiveReport.tpl.html"):
 	if not os.path.exists(templateFile):
 		log.error("Template file for interactive report went missing.. "+templateFile)
 		exit()
@@ -76,8 +76,8 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 	basepath=os.path.join(outPath,"csv")
 	relpath="csv"
 	for k in reportConfig:
+		log.debug(k)
 		# check path relative to us running
-		print k
 		candidatePath=os.path.join(basepath,k[0]+".csv")
 		if os.path.exists(candidatePath):
 			# add path relative to where the output is
@@ -117,6 +117,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 			#for h in headings:
 			#	print max(data[k[0]][h])
 	
+	# fill in place holders in template file
 	for l in tplFile:
 		if "[__datetime__]" in l:
 			line = l.replace("[__datetime__]", str(datetime.datetime.now()))
@@ -135,7 +136,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 		elif "[__specialOpts__]" in l:
 			line = ""
 			for s in specialOpts:
-				print s
+				log.debug(s)
 				if line == "":
 					line += '{' + s + '}'
 				else:
@@ -148,7 +149,10 @@ def createInteractiveReport(reportConfig, outPath, data=None, fname="interactive
 					line += '["' + '","'.join(s) + '"]'
 				else:
 					line += ',\n["' + '","'.join(s) + '"]'
-					
+		
+		elif "[__dygraphLoc__]" in l:
+			line = l.replace("[__dygraphLoc__]", dygraphLoc)
+			
 		else:
 			line = l
 					

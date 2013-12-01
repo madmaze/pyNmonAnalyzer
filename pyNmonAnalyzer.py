@@ -91,7 +91,7 @@ class pyNmonAnalyzer:
 			self.buildReport()
 		if self.args.buildInteractiveReport:
 			log.info("Preparing interactive Report..")
-			self.buildInteractiveReport(self.processedData)
+			self.buildInteractiveReport(self.processedData, args.dygraphLoc)
 		
 		log.info("All done, exiting.")
 	
@@ -184,7 +184,7 @@ class pyNmonAnalyzer:
 		# Build HTML report
 		pyNmonReport.createReport(outFiles, self.args.outdir)
 	
-	def buildInteractiveReport(self, data):
+	def buildInteractiveReport(self, data, dygraphLoc):
 		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
 		#       For DISKBUSY and NET please do adjust the collumns you'd like to plot
 		
@@ -195,7 +195,7 @@ class pyNmonAnalyzer:
 			exit()			
 
 		# Build interactive HTML report using dygraphs
-		pyNmonReport.createInteractiveReport(reportConfig, self.args.outdir, data=data)
+		pyNmonReport.createInteractiveReport(reportConfig, self.args.outdir, data=data, dygraphLoc=dygraphLoc)
 			
 		
 	def outputData(self, outputFormat):
@@ -211,6 +211,7 @@ if __name__ == "__main__":
 	parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
 	parser.add_argument("--buildInteractiveReport", action="store_true", dest="buildInteractiveReport", help="Compile interactive report? (Default: False)")
 	parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
+	parser.add_argument("--dygraphLocation", dest="dygraphLoc", default="http://dygraphs.com/dygraph-dev.js", help="Specify local or remote location of dygraphs library. This only applies to the interactive report. (Default: http://dygraphs.com/dygraph-dev.js)")
 	parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
 	parser.add_argument("-l","--log",dest="logLevel", default="INFO", help="Logging verbosity, use DEBUG for more output and showing graphs (Default: INFO)")
 	args = parser.parse_args()
