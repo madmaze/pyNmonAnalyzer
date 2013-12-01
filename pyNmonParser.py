@@ -73,15 +73,20 @@ class pyNmonParser:
 			self.tStamp[line[1]]=line[3]+" "+line[2]
 		else:
 			if line[0] in self.processedData.keys():
-				table=self.processedData[line[0]]
+				table = self.processedData[line[0]]
 				for n,col in enumerate(table):
 					# line[1] give you the T####
 					if n == 0 and line[n+1] in self.tStamp.keys():
 						# lookup the time stamp in tStamp
 						col.append(self.tStamp[line[n+1]])
+					elif n == 0 and line[0] == "TOP":
+						#log.debug("Discarding line containing TOP info %s" % line)
+						break
+
 					elif n == 0 and line[n+1] not in self.tStamp.keys():
 						log.warn("Discarding line with missing Timestamp %s" % line)
 						break
+						
 					else:
 						# TODO: do parsing(str2float) here
 						col.append(line[n+1])
