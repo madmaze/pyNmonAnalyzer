@@ -72,6 +72,14 @@ class pyNmonParser:
 		elif "ZZZZ" in header:
 			self.tStamp[line[1]]=line[3]+" "+line[2]
 		else:
+			if "TOP" in line[0] and len(line) > 3:
+					# top lines are the only ones that do not have the timestamp
+					# as the second column, therefore we rearrange for parsing.
+					# kind of a hack, but so is the rest of this parsing
+					pid = line[1]
+					line[1] = line[2]
+					line[2] = pid
+					
 			if line[0] in self.processedData.keys():
 				table = self.processedData[line[0]]
 				for n,col in enumerate(table):
@@ -79,9 +87,6 @@ class pyNmonParser:
 					if n == 0 and line[n+1] in self.tStamp.keys():
 						# lookup the time stamp in tStamp
 						col.append(self.tStamp[line[n+1]])
-					elif n == 0 and line[0] == "TOP":
-						#log.debug("Discarding line containing TOP info %s" % line)
-						break
 
 					elif n == 0 and line[n+1] not in self.tStamp.keys():
 						log.warn("Discarding line with missing Timestamp %s" % line)
@@ -99,13 +104,20 @@ class pyNmonParser:
 					
 			else:
 				# new collumn, hoping these are headers
+				# We are expecting a header row like:
+				# CPU01,CPU 1 the-gibson,User%,Sys%,Wait%,Idle%
 				header=[]
-				for h in line[1:]:
-					# make it an array
-					tmp=[]
-					tmp.append(h)
-					header.append(tmp)
-				self.processedData[line[0]]=header
+				if "TOP" in line[0] and len(line) < 3:
+					# For some reason Top has two header rows, the first with only
+					# two columns and then the real one therefore we skip the first row
+					pass
+				else:
+					for h in line[1:]:
+						# make it an array
+						tmp=[]
+						tmp.append(h)
+						header.append(tmp)
+					self.processedData[line[0]]=header
 			
 	def parse(self):
 		# TODO: check fname
