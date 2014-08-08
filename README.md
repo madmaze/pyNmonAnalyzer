@@ -27,11 +27,23 @@ Getting started:
 -----
 - [Python Nmon Analyzer: moving away from excel macros](http://matthiaslee.com/?q=node/38)
 
+Installation:
+-----
+pyNmonAnalyzer is now available through pip and easy_install.   
+If you have pip:   
+```$> sudo pip install pyNmonAnalyzer```
+
+If you'd like to mess with the source, please feel free to fork 
+this github repo and contribute back changes.
+
+
 Usage:
 -----
 ```
-usage: pyNmonAnalyzer.py [-h] [-x] [-d] [-i INPUT_FILE] [-o OUTDIR] [-c] [-b]
-                         [-r CONFFNAME] [--defaultConfig]
+usage: pyNmonAnalyzer [-h] [-x] [-d] [-i INPUT_FILE] [-o OUTDIR] [-c] [-b]
+                      [--buildInteractiveReport] [-r CONFFNAME]
+                      [--dygraphLocation DYGRAPHLOC] [--defaultConfig]
+                      [-l LOGLEVEL]
 
 nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for
 easier analysis, without the use of the MS Excel Macro. Also included is an
@@ -53,6 +65,10 @@ optional arguments:
   -r CONFFNAME, --reportConfig CONFFNAME
                         Report config file, if none exists: we will write the
                         default config file out (Default: ./report.config)
+  --dygraphLocation DYGRAPHLOC
+                        Specify local or remote location of dygraphs library.
+                        This only applies to the interactive report. (Default:
+                        http://dygraphs.com/dygraph-dev.js)
   --defaultConfig       Write out a default config file
   -l LOGLEVEL, --log LOGLEVEL
                         Logging verbosity, use DEBUG for more output and
@@ -62,22 +78,22 @@ optional arguments:
 Example Usage:
 -------------
 First generate a report config, most likely the default is all you need. This creates ./report.config
-```$> ./pyNmonAnalyzer.py --defaultConfig```
+```$> pyNmonAnalyzer --defaultConfig```
 
 Build HTML report with *interactive* graphs for test.nmon and store results to testReport  
-```$> ./pyNmonAnalyzer.py --buildInteractiveReport -o testReport -i test.nmon```
+```$> pyNmonAnalyzer --buildInteractiveReport -o testReport -i test.nmon```
 
 Build HTML report with graphs for test.nmon and store results to testReport  
-```$> ./pyNmonAnalyzer.py -b -o testReport -i test.nmon```
+```$> pyNmonAnalyzer -b -o testReport -i test.nmon```
 
 Compile CSV formatted tables for data in test.nmon and store results to testOut  
-```$> ./pyNmonAnalyzer.py -c -o testOut -i test.nmon```
+```$> pyNmonAnalyzer -c -o testOut -i test.nmon```
 
 License:
 -------
 ```
-Copyright (c) 2012-2013 Matthias Lee, matthias.a.lee[]gmail.com
-Last edited: June 24th 2013
+Copyright (c) 2012-2014 Matthias Lee, matthias.a.lee[]gmail.com
+Last edited: August 8th 2014
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
