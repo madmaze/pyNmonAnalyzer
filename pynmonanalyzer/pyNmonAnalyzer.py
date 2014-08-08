@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Copyright (c) 2012-2013 Matthias Lee
+Copyright (c) 2012-2014 Matthias Lee
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class pyNmonAnalyzer:
 			# write out default report and exit
 			log.warn("Note: writing default report config file to " + self.args.confFname)
 			self.saveReportConfig(self.stdReport)
-			exit()
+			sys.exit()
 		
 		if self.args.buildReport:
 			# check whether specified report config exists
@@ -58,7 +58,7 @@ class pyNmonAnalyzer:
 					log.warn("Please adjust report.config to ensure the correct devices will be graphed.")
 				else:
 					log.warn("\nNOTE: you could try using the default config file with: -r report.config")
-				exit()
+				sys.exit()
 		
 		# check ouput dir, if not create
 		if os.path.exists(self.args.outdir) and args.overwrite:
@@ -66,18 +66,18 @@ class pyNmonAnalyzer:
 				rmtree(self.args.outdir)
 			except:
 				log.error("Removing old dir:",self.args.outdir)
-				exit()
+				sys.exit()
 				
 		elif os.path.exists(self.args.outdir):
 			log.error("Results directory already exists, please remove or use '-x' to overwrite")
-			exit()
+			sys.exit()
 			
 		# Create results path if not existing
 		try:
 			os.makedirs(self.args.outdir)
 		except:
 			log.error("Creating results dir:", self.args.outdir)
-			exit()
+			sys.exit()
 		
 		# This is where the magic begins
 		self.nmonParser = pyNmonParser.pyNmonParser(args.input_file, args.outdir, args.overwrite)
@@ -176,7 +176,7 @@ class pyNmonAnalyzer:
 			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
 		else:
 			log.error("something went wrong.. looks like %s is missing. run --defaultConfig to generate a template" % (self.args.confFname))
-			exit()			
+			sys.exit()
 		
 		# TODO implement plotting options
 		outFiles = nmonPlotter.plotStats(reportConfig)
@@ -192,7 +192,7 @@ class pyNmonAnalyzer:
 			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
 		else:
 			log.error("something went wrong.. looks like %s is missing. run --defaultConfig to generate a template" % (self.args.confFname))
-			exit()			
+			sys.exit()
 
 		# Build interactive HTML report using dygraphs
 		pyNmonReport.createInteractiveReport(reportConfig, self.args.outdir, data=data, dygraphLoc=dygraphLoc)
@@ -202,6 +202,7 @@ class pyNmonAnalyzer:
 		self.nmonParser.output(outputFormat)
 		
 if __name__ == "__main__":
+	print "__Deprecated__ entry point"
 	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with graphs, which is configured through report.config.")
 	parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
 	parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
@@ -219,12 +220,12 @@ if __name__ == "__main__":
 	if len(sys.argv) == 1:
 		# no arguments specified
 		parser.print_help()
-		exit()
+		sys.exit()
 	
 	logLevel = getattr(log, args.logLevel.upper())
 	if logLevel is None:
 		print "ERROR: Invalid logLevel:", args.loglevel
-		exit()
+		sys.exit()
 	if args.debug:
 		log.basicConfig(level=logLevel, format='%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s')
 	else:
