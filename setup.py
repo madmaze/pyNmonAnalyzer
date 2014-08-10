@@ -29,7 +29,8 @@ setup(
     keywords = "python nmon analyzer pynmonanalyzer interactive static report visualization",
     url = "https://github.com/madmaze/pynmonanalyzer",
     packages=['pynmonanalyzer'],
-    package_data = {'pynmonanalyzer': ['*.nmon','*.html']},
+    package_dir={'pynmonanalyzer': 'src'},
+    package_data = {'pynmonanalyzer': ['test.nmon','interactiveReport.tpl.html']},
     entry_points={
         "console_scripts": [
             "pyNmonAnalyzer=pynmonanalyzer:main",
