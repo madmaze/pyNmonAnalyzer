@@ -53,6 +53,8 @@ def createReport(outFiles, outPath, fname="report.html"):
 	report.close()
 
 def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http://dygraphs.com/dygraph-dev.js",fname="interactiveReport.html", templateFile="interactiveReport.tpl.html"):
+	pkgdir = os.path.abspath(os.path.dirname(__file__))
+	templateFile = os.path.join(pkgdir,templateFile)
 	if not os.path.exists(templateFile):
 		log.error("Template file for interactive report went missing.. "+templateFile)
 		exit()

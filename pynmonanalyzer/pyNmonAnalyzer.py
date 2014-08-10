@@ -61,7 +61,7 @@ class pyNmonAnalyzer:
 				sys.exit()
 		
 		# check ouput dir, if not create
-		if os.path.exists(self.args.outdir) and args.overwrite:
+		if os.path.exists(self.args.outdir) and self.args.overwrite:
 			try:
 				rmtree(self.args.outdir)
 			except:
@@ -80,7 +80,7 @@ class pyNmonAnalyzer:
 			sys.exit()
 		
 		# This is where the magic begins
-		self.nmonParser = pyNmonParser.pyNmonParser(args.input_file, args.outdir, args.overwrite)
+		self.nmonParser = pyNmonParser.pyNmonParser(args.input_file, self.args.outdir, self.args.overwrite)
 		self.processedData = self.nmonParser.parse()
 		
 		if self.args.outputCSV or self.args.buildInteractiveReport:
@@ -91,7 +91,7 @@ class pyNmonAnalyzer:
 			self.buildReport()
 		if self.args.buildInteractiveReport:
 			log.info("Preparing interactive Report..")
-			self.buildInteractiveReport(self.processedData, args.dygraphLoc)
+			self.buildInteractiveReport(self.processedData, self.args.dygraphLoc)
 		
 		log.info("All done, exiting.")
 	
@@ -167,7 +167,7 @@ class pyNmonAnalyzer:
 		return reportConfig
 	
 	def buildReport(self):
-		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, args.outdir, debug=self.args.debug)
+		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, self.args.outdir, debug=self.args.debug)
 				
 		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
 		#       For DISKBUSY and NET please do adjust the collumns you'd like to plot
