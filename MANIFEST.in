@@ -1,0 +1,2 @@
+recursive-include src *.nmon
+recursive-include src *.tpl.html
