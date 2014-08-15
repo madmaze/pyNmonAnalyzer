@@ -90,15 +90,19 @@ class pyNmonAnalyzer:
 		self.nmonParser = pyNmonParser.pyNmonParser(self.args.input_file, self.args.outdir, self.args.overwrite)
 		self.processedData = self.nmonParser.parse()
 		
-		if self.args.outputCSV or self.args.buildInteractiveReport:
+		if self.args.outputCSV or "inter" in self.args.reportType.lower():
 			log.info("Preparing CSV files..")
 			self.outputData("csv")
 		if self.args.buildReport:
-			log.info("Preparing graphs..")
-			self.buildReport()
-		if self.args.buildInteractiveReport:
-			log.info("Preparing interactive Report..")
-			self.buildInteractiveReport(self.processedData, self.args.dygraphLoc)
+			if "stat" in self.args.reportType.lower():
+				log.info("Preparing static Report..")
+				self.buildReport()
+			elif "inter" in self.args.reportType.lower():
+				log.info("Preparing interactive Report..")
+				self.buildInteractiveReport(self.processedData, self.args.dygraphLoc)
+			else:
+				log.error("Report type: %s\t is not recognized" % self.args.reportType)
+				sys.exit()
 		
 		log.info("All done, exiting.")
 	
@@ -110,7 +114,7 @@ class pyNmonAnalyzer:
 		parser.add_argument("-o","--output", dest="outdir", default="./report/", help="Output dir for CSV (Default: ./report/)")
 		parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
 		parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
-		parser.add_argument("--buildInteractiveReport", action="store_true", dest="buildInteractiveReport", help="Compile interactive report? (Default: False)")
+		parser.add_argument("-t","--reportType", dest="reportType", default="interactive", help="Should we be generating a \"static\" or \"interactive\" report (Default: interactive")
 		parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
 		parser.add_argument("--dygraphLocation", dest="dygraphLoc", default="http://dygraphs.com/dygraph-dev.js", help="Specify local or remote location of dygraphs library. This only applies to the interactive report. (Default: http://dygraphs.com/dygraph-dev.js)")
 		parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
