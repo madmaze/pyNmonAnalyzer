@@ -41,7 +41,7 @@ Usage:
 -----
 ```
 usage: pyNmonAnalyzer [-h] [-x] [-d] [-i INPUT_FILE] [-o OUTDIR] [-c] [-b]
-                      [--buildInteractiveReport] [-r CONFFNAME]
+                      [-t REPORTTYPE] [-r CONFFNAME]
                       [--dygraphLocation DYGRAPHLOC] [--defaultConfig]
                       [-l LOGLEVEL]
 
@@ -60,8 +60,9 @@ optional arguments:
                         Output dir for CSV (Default: ./report/)
   -c, --csv             CSV output? (Default: False)
   -b, --buildReport     report output? (Default: False)
-  --buildInteractiveReport
-                        Compile interactive report? (Default: False)
+  -t REPORTTYPE, --reportType REPORTTYPE
+                        Should we be generating a "static" or "interactive"
+                        report (Default: interactive
   -r CONFFNAME, --reportConfig CONFFNAME
                         Report config file, if none exists: we will write the
                         default config file out (Default: ./report.config)
@@ -81,10 +82,10 @@ First generate a report config, most likely the default is all you need. This cr
 ```$> pyNmonAnalyzer --defaultConfig```
 
 Build HTML report with *interactive* graphs for test.nmon and store results to testReport  
-```$> pyNmonAnalyzer --buildInteractiveReport -o testReport -i test.nmon```
-
-Build HTML report with graphs for test.nmon and store results to testReport  
 ```$> pyNmonAnalyzer -b -o testReport -i test.nmon```
+
+Build HTML report with static graphs for test.nmon and store results to testReport  
+```$> pyNmonAnalyzer -b -t static -o testReport -i test.nmon```
 
 Compile CSV formatted tables for data in test.nmon and store results to testOut  
 ```$> pyNmonAnalyzer -c -o testOut -i test.nmon```

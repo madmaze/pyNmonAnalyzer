@@ -21,7 +21,7 @@ import argparse
 import logging as log
 
 def main(args=None):
-	_ = pna.pyNmonAnalyzer(raw_args=sys.argv)
+	_ = pna.pyNmonAnalyzer(raw_args=sys.argv[1:])
 
 if __name__ == '__main__':
 	sys.exit(main())
