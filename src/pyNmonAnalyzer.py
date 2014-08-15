@@ -38,8 +38,15 @@ class pyNmonAnalyzer:
 	
 	stdReport = [('CPU_ALL', ['user', 'sys', 'wait'], 'stackedGraph: true, fillGraph: true'), ('DISKBUSY', ['sda1', 'sdb1'], ''), ('MEM', ['memtotal', 'active'], ''), ('NET', ['eth0'], '')]
 	
-	def __init__(self, args):
-		self.args = args
+	def __init__(self, args=None, raw_args=None):
+		if args is None and raw_args is None:
+			log.error("args and rawargs cannot be None.")
+			sys.exit()
+		if args is None:
+			self.args = self.parseargs(raw_args)
+		else:
+			self.args = args
+			
 		if self.args.defaultConf:
 			# write out default report and exit
 			log.warn("Note: writing default report config file to " + self.args.confFname)
@@ -80,7 +87,7 @@ class pyNmonAnalyzer:
 			sys.exit()
 		
 		# This is where the magic begins
-		self.nmonParser = pyNmonParser.pyNmonParser(args.input_file, self.args.outdir, self.args.overwrite)
+		self.nmonParser = pyNmonParser.pyNmonParser(self.args.input_file, self.args.outdir, self.args.overwrite)
 		self.processedData = self.nmonParser.parse()
 		
 		if self.args.outputCSV or self.args.buildInteractiveReport:
@@ -94,6 +101,37 @@ class pyNmonAnalyzer:
 			self.buildInteractiveReport(self.processedData, self.args.dygraphLoc)
 		
 		log.info("All done, exiting.")
+	
+	def parseargs(self, raw_args):
+		parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with graphs, which is configured through report.config.")
+		parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
+		parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
+		parser.add_argument("-i","--inputfile",dest="input_file", default="test.nmon", help="Input NMON file")
+		parser.add_argument("-o","--output", dest="outdir", default="./report/", help="Output dir for CSV (Default: ./report/)")
+		parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
+		parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
+		parser.add_argument("--buildInteractiveReport", action="store_true", dest="buildInteractiveReport", help="Compile interactive report? (Default: False)")
+		parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
+		parser.add_argument("--dygraphLocation", dest="dygraphLoc", default="http://dygraphs.com/dygraph-dev.js", help="Specify local or remote location of dygraphs library. This only applies to the interactive report. (Default: http://dygraphs.com/dygraph-dev.js)")
+		parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
+		parser.add_argument("-l","--log",dest="logLevel", default="INFO", help="Logging verbosity, use DEBUG for more output and showing graphs (Default: INFO)")
+		args = parser.parse_args(raw_args)
+		
+		if len(sys.argv) == 1:
+			# no arguments specified
+			parser.print_help()
+			sys.exit()
+		
+		logLevel = getattr(log, args.logLevel.upper())
+		if logLevel is None:
+			print "ERROR: Invalid logLevel:", args.loglevel
+			sys.exit()
+		if args.debug:
+			log.basicConfig(level=logLevel, format='%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s')
+		else:
+			log.basicConfig(level=logLevel, format='%(levelname)s - %(message)s')
+		
+		return args
 	
 	def saveReportConfig(self, reportConf, configFname="report.config"):
 		# TODO: add some error checking
@@ -202,33 +240,5 @@ class pyNmonAnalyzer:
 		self.nmonParser.output(outputFormat)
 		
 if __name__ == "__main__":
-	print "__Deprecated__ entry point"
-	parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with graphs, which is configured through report.config.")
-	parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
-	parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
-	parser.add_argument("-i","--inputfile",dest="input_file", default="test.nmon", help="Input NMON file")
-	parser.add_argument("-o","--output", dest="outdir", default="./report/", help="Output dir for CSV (Default: ./report/)")
-	parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
-	parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
-	parser.add_argument("--buildInteractiveReport", action="store_true", dest="buildInteractiveReport", help="Compile interactive report? (Default: False)")
-	parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
-	parser.add_argument("--dygraphLocation", dest="dygraphLoc", default="http://dygraphs.com/dygraph-dev.js", help="Specify local or remote location of dygraphs library. This only applies to the interactive report. (Default: http://dygraphs.com/dygraph-dev.js)")
-	parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
-	parser.add_argument("-l","--log",dest="logLevel", default="INFO", help="Logging verbosity, use DEBUG for more output and showing graphs (Default: INFO)")
-	args = parser.parse_args()
-	
-	if len(sys.argv) == 1:
-		# no arguments specified
-		parser.print_help()
-		sys.exit()
-	
-	logLevel = getattr(log, args.logLevel.upper())
-	if logLevel is None:
-		print "ERROR: Invalid logLevel:", args.loglevel
-		sys.exit()
-	if args.debug:
-		log.basicConfig(level=logLevel, format='%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s')
-	else:
-		log.basicConfig(level=logLevel, format='%(levelname)s - %(message)s')
-	nmonAnalyzer = pyNmonAnalyzer(args)
+	_ = pyNmonAnalyzer(raw_args=sys.argv[1:])
 	
