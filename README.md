@@ -12,8 +12,10 @@ project is currently a work-in-progress and therefore will hopefully improve in
 functionality and usability. If you have questions, find a bug or have feature requests, please do
 file an issues [here](https://github.com/madmaze/pyNmonAnalyzer/issues)
 
-- [Example Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/data/report.html)
-- [Example Advanced Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/interactiveReport.html)
+**Example Reports:**
+---------------
+- [Static Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/data/report.html)
+- [Interactive Report](http://matthiaslee.com/scratch/pyNmonAnalyzer/interactiveReport.html)
 
 
 Goals:
@@ -89,6 +91,16 @@ Build HTML report with static graphs for test.nmon and store results to testRepo
 
 Compile CSV formatted tables for data in test.nmon and store results to testOut  
 ```$> pyNmonAnalyzer -c -o testOut -i test.nmon```
+
+Troubleshooting:
+---------------
+- **It crashes or my graphs don't show anything!**   
+	Have you looked at your current report.config? Is it customized to your device names?
+- **My interactive report will not display! What did I do wrong?**   
+	Since the interactive report uses javascript to load CSV files, your browser needs to be allowed to read local files(if you are viewing locally). Firefox has been the most reliable for me, chrome currently does not allow JS to access local files.
+
+**Any other problems, file an issue or send me an email.**
+
 
 License:
 -------
