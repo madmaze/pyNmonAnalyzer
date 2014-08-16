@@ -66,7 +66,7 @@ class pyNmonParser:
 			self.sysInfo.append(line[1:])
 		elif "BBB" in header:
 			# more detailed System Spec
-			# do more grandular processing
+			# do more granular processing
 			# refer to pg 11 of analyzer handbook
 			self.bbbInfo.append(line)
 		elif "ZZZZ" in header:
@@ -94,7 +94,14 @@ class pyNmonParser:
 						
 					else:
 						# TODO: do parsing(str2float) here
-						col.append(line[n+1])
+						if len(line) > n+1:
+							col.append(line[n+1])
+						else:
+							# somehow we are missing an entry here
+							# As in we have a heading, but no data
+							log.debug("We found more column titles than data for the category:"+line[0]+". This has been observed with some versions of NMON on AIX")
+							log.debug("This tends to happen with the LPAR readings, double check whether your data makes sense, if so you can ignore this.")
+							col.append("0")
 						# this should always be a float
 						#try:
 						#	col.append(float(line[n+1]))
@@ -103,7 +110,7 @@ class pyNmonParser:
 						#	col.append(line[n+1])
 					
 			else:
-				# new collumn, hoping these are headers
+				# new column, hoping these are headers
 				# We are expecting a header row like:
 				# CPU01,CPU 1 the-gibson,User%,Sys%,Wait%,Idle%
 				header=[]
