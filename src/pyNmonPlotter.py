@@ -54,7 +54,7 @@ class pyNmonPlotter:
 				log.error("Creating results dir:",self.imgPath)
 				exit()
 		
-	def plotStats(self, todoList):
+	def plotStats(self, todoList, isAIX=False):
 		outFiles=[]
 		if len(todoList) <= 0:
 			log.error("Nothing to plot")
@@ -97,13 +97,22 @@ class pyNmonPlotter:
 				
 				mem=np.array(self.processedData["MEM"])
 				
-				# used = total - free - buffers - chache
-				total = np.array([float(x) for x in mem[1][1:]])
-				free = np.array([float(x) for x in mem[5][1:]])
-				cache = np.array([float(x) for x in mem[10][1:]])
-				buffers = np.array([float(x) for x in mem[13][1:]])
+				colidx = {"total":1,"free":5,"cache":10,"buffers":13}
+				if isAIX:
+					colidx={"total":5,"free":3}
+				
+				# used = total - free - buffers - cache
+				total = np.array([float(x) for x in mem[colidx["total"]][1:]])
+				free = np.array([float(x) for x in mem[colidx["free"]][1:]])
+				
+				if not isAIX:
+					cache = np.array([float(x) for x in mem[colidx["cache"]][1:]])
+					buffers = np.array([float(x) for x in mem[colidx["buffers"]][1:]])
 
-				used = total - free - cache - buffers
+					used = total - free - cache - buffers
+				else:
+					used = total - free
+					
 				values.append((used,"used mem"))
 				values.append((total,"total mem"))
 				
@@ -139,7 +148,7 @@ class pyNmonPlotter:
 		
 		# figure dimensions
 		fig = plt.figure(figsize=(13,4), frameon=True)
-		# risizing to hack the legend in the right location
+		# resizing to hack the legend in the right location
 		fig.subplots_adjust(right=.8)
 		ax = fig.add_subplot(1,1,1)
 		
@@ -147,7 +156,7 @@ class pyNmonPlotter:
 		times, values = data 
 		
 		if stacked:
-			# TODO: parameterize out so that it can be more versitile
+			# TODO: parameterize out so that it can be more versatile
 			a = np.array([float(x) for x in values[0][0]])
 			b = np.array([float(x) for x in values[1][0]])
 			c = np.array([float(x) for x in values[2][0]])

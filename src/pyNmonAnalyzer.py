@@ -110,6 +110,7 @@ class pyNmonAnalyzer:
 		parser = argparse.ArgumentParser(description="nmonParser converts NMON monitor files into time-sorted CSV/Spreadsheets for easier analysis, without the use of the MS Excel Macro. Also included is an option to build an HTML report with graphs, which is configured through report.config.")
 		parser.add_argument("-x","--overwrite", action="store_true", dest="overwrite", help="overwrite existing results (Default: False)")
 		parser.add_argument("-d","--debug", action="store_true", dest="debug", help="debug? (Default: False)")
+		parser.add_argument("--force", action="store_true", dest="force", help="force using of config (Default: False)")
 		parser.add_argument("-i","--inputfile",dest="input_file", default="test.nmon", help="Input NMON file")
 		parser.add_argument("-o","--output", dest="outdir", default="./report/", help="Output dir for CSV (Default: ./report/)")
 		parser.add_argument("-c","--csv", action="store_true", dest="outputCSV", help="CSV output? (Default: False)")
@@ -143,16 +144,25 @@ class pyNmonAnalyzer:
 		header = '''
 # Plotting configuration file.
 # =====
-# please edit this file carefully, generally the CPU and MEM options are left blank
-# 	since there is under the hood calculations going on to plot used vs total mem and 
-#	CPU plots usr/sys/wait for all CPUs on the system
+# Please edit this file carefully, generally the CPU and MEM options are left with 
+# 	their defaults. For the static report, these have special under the hood calculations
+#   to give you the used memory vs total memory instead of free vs total.
+# For the Interactive report, the field names are used to pic out the right field from the CSV
+# files for plotting.
+# 
 # Do adjust DISKBUSY and NET to plot the desired data
 #
-# Defaults:
+# Defaults for Linux Systems:
 # CPU_ALL=user,sys,wait{stackedGraph: true, fillGraph: true}
 # DISKBUSY=sda1,sdb1{}
 # MEM=memtotal,active{}
 # NET=eth0{}
+#
+# Defaults for AIX Systems
+# CPU_ALL=user,sys,wait{stackedGraph: true, fillGraph: true}
+# DISKBUSY=hdisk1,hdisk10{}
+# MEM=Real total(MB),Real free(MB){}
+# NET=en2{}
 
 '''
 		f.write(header)
@@ -212,7 +222,7 @@ class pyNmonAnalyzer:
 		nmonPlotter = pyNmonPlotter.pyNmonPlotter(self.processedData, self.args.outdir, debug=self.args.debug)
 				
 		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
-		#       For DISKBUSY and NET please do adjust the collumns you'd like to plot
+		#       For DISKBUSY and NET please do adjust the columns you'd like to plot
 		
 		if os.path.exists(self.args.confFname):
 			reportConfig = self.loadReportConfig(configFname=self.args.confFname)
@@ -220,11 +230,32 @@ class pyNmonAnalyzer:
 			log.error("something went wrong.. looks like %s is missing. run --defaultConfig to generate a template" % (self.args.confFname))
 			sys.exit()
 		
+		if self.isAIX():
+			# check whether a Linux reportConfig is being used on an AIX nmon file
+			wrongConfig = False
+			indicators = {"DISKBUSY":"sd","NET":"eth","MEM":"memtotal"}
+			for cat,param,_ in reportConfig:
+				if cat in indicators and indicators[cat] in param:
+					wrongConfig=True
+			
+			if wrongConfig:
+				if not self.args.force:
+					log.error("It looks like you might have the wrong settings in your report.config.")
+					log.error("From what we can see you have settings for a Linux system but an nmon file of an AIX system")
+					log.error("if you want to ignore this error, please use --force")
+					sys.exit()
+		
 		# TODO implement plotting options
-		outFiles = nmonPlotter.plotStats(reportConfig)
+		outFiles = nmonPlotter.plotStats(reportConfig, self.isAIX())
 		
 		# Build HTML report
 		pyNmonReport.createReport(outFiles, self.args.outdir)
+	
+	def isAIX(self):
+		#TODO: find better test to see if it is AIX
+		if "PROCAIO" in self.processedData:
+			return True
+		return False
 	
 	def buildInteractiveReport(self, data, dygraphLoc):
 		# Note: CPU and MEM both have different logic currently, so they are just handed empty arrays []
