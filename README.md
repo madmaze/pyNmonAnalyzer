@@ -42,8 +42,8 @@ this github repo and contribute back changes.
 Usage:
 -----
 ```
-usage: pyNmonAnalyzer [-h] [-x] [-d] [-i INPUT_FILE] [-o OUTDIR] [-c] [-b]
-                      [-t REPORTTYPE] [-r CONFFNAME]
+usage: pyNmonAnalyzer [-h] [-x] [-d] [--force] [-i INPUT_FILE] [-o OUTDIR]
+                      [-c] [-b] [-t REPORTTYPE] [-r CONFFNAME]
                       [--dygraphLocation DYGRAPHLOC] [--defaultConfig]
                       [-l LOGLEVEL]
 
@@ -56,6 +56,7 @@ optional arguments:
   -h, --help            show this help message and exit
   -x, --overwrite       overwrite existing results (Default: False)
   -d, --debug           debug? (Default: False)
+  --force               force using of config (Default: False)
   -i INPUT_FILE, --inputfile INPUT_FILE
                         Input NMON file
   -o OUTDIR, --output OUTDIR
@@ -64,7 +65,7 @@ optional arguments:
   -b, --buildReport     report output? (Default: False)
   -t REPORTTYPE, --reportType REPORTTYPE
                         Should we be generating a "static" or "interactive"
-                        report (Default: interactive
+                        report (Default: interactive)
   -r CONFFNAME, --reportConfig CONFFNAME
                         Report config file, if none exists: we will write the
                         default config file out (Default: ./report.config)
@@ -91,6 +92,15 @@ Build HTML report with static graphs for test.nmon and store results to testRepo
 
 Compile CSV formatted tables for data in test.nmon and store results to testOut  
 ```$> pyNmonAnalyzer -c -o testOut -i test.nmon```
+
+Configuration:
+-------------
+To control which items get graphed(CPU, MEM etc) you need to configure the report.config file. 
+This is especially important for AIX NMON systems. To get a sense of what the config file 
+should look like, run `pyNmonAnalyzer --defaultConfig` this will generate "report.config" in 
+your local directory. It contians two examples, one for Linux and one for AIX systems. 
+Adjust them according to your device names, for Linux you'll want to set DISKBUSY to your sda1 or sdb1 or what ever.
+You should be able to use **any** nmon performance stats, so DISKBUSY, DISKREAD, CPU1, CPU2 etc.
 
 Troubleshooting:
 ---------------
