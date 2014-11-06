@@ -55,7 +55,7 @@ class pyNmonAnalyzer:
 		
 		if self.args.buildReport:
 			# check whether specified report config exists
-			if os.path.exists("report.config") == False:
+			if os.path.exists(self.args.confFname) == False:
 				log.warn("looks like the specified config file(\""+self.args.confFname+"\") does not exist.")
 				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
 				
