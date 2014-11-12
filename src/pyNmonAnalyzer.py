@@ -50,17 +50,17 @@ class pyNmonAnalyzer:
 		if self.args.defaultConf:
 			# write out default report and exit
 			log.warn("Note: writing default report config file to " + self.args.confFname)
-			self.saveReportConfig(self.stdReport)
+			self.saveReportConfig(self.stdReport, configFname=self.args.confFname)
 			sys.exit()
 		
 		if self.args.buildReport:
 			# check whether specified report config exists
-			if os.path.exists("report.config") == False:
+			if os.path.exists(self.args.confFname) == False:
 				log.warn("looks like the specified config file(\""+self.args.confFname+"\") does not exist.")
 				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
 				
 				if ans.strip().lower() == "y":
-					self.saveReportConfig(self.stdReport)
+					self.saveReportConfig(self.stdReport, configFname=self.args.confFname)
 					log.warn("Wrote default config to report.config.")
 					log.warn("Please adjust report.config to ensure the correct devices will be graphed.")
 				else:
