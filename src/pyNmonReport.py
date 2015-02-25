@@ -72,9 +72,12 @@ def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http:/
 		log.error("Could not open report file!")
 		exit()
 	
+	# collects paths to plottable corresponding CSV
 	dataSources=[]
 	displayCols=[]
 	specialOpts=[]
+	# This list collects every stat/config we verified plot as plottable
+	verifiedConfigs=[]
 	basepath=os.path.join(outPath,"csv")
 	relpath="csv"
 	for k in reportConfig:
@@ -84,6 +87,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http:/
 		if os.path.exists(candidatePath):
 			# add path relative to where the output is
 			dataSources.append(os.path.join(relpath,k[0]+".csv"))
+			verifiedConfigs.append(k)
 			
 			# add to display cols
 			localMin=None
@@ -114,10 +118,9 @@ def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http:/
 			else:
 				localOpts = 'valueRange: [%f, %f]' % (0.0, localMax*1.05)
 			specialOpts.append((localOpts))
-			
-			# get min/max of columns
-			#for h in headings:
-			#	print max(data[k[0]][h])
+		
+		else:
+			log.warn("Key: %s, was not found in the processed nmon data, please manually check the available stats." % k[0])
 	
 	# fill in place holders in template file
 	for l in tplFile:
@@ -126,7 +129,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http:/
 		elif "[__plots__]" in l:
 			line = ""
 			for i in range(len(dataSources)):
-				line += '<h2>'+reportConfig[i][0]+'</h2></ br>\n <div id="plot' + str(i) + '"  style="width:1000px; height:300px;">loading...</div> </ br></ br> \n'
+				line += '<h2>'+verifiedConfigs[i][0]+'</h2></ br>\n <div id="plot' + str(i) + '"  style="width:1000px; height:300px;">loading...</div> </ br></ br> \n'
 		elif "[__dataSources__]" in l:
 			line = ""
 			for s in dataSources:
