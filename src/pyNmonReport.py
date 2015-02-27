@@ -93,7 +93,9 @@ def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http:/
 			localMin=None
 			localMax=None
 			headings=[]
-			for c in data[k[0]]:
+			
+			# go through data, skip the first column which contains the dates
+			for c in data[k[0]][1:]:
 				for i in k[1]:
 					# match anything that contains a key from reportConfig
 					if i.lower() in c[0].lower():
