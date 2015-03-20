@@ -21,22 +21,20 @@ import logging as log
 import datetime
 
 class pyNmonParser:
-	fname = ""
-	outdir = ""
-
-	# Holds final 2D arrays of each stat
-	processedData = {}
-	# Holds System Info gathered by nmon
-	sysInfo=[]
-	bbbInfo=[]
-	# Holds timestamps for later lookup
-	tStamp={}
 	
 	def __init__(self, fname="./test.nmon",outdir="./data/",overwrite=False,debug=False):
 		# TODO: check input vars or "die"
 		self.fname = fname
 		self.outdir = outdir
 		self.debug = debug
+		
+		# Holds final 2D arrays of each stat
+		self.processedData = {}
+		# Holds System Info gathered by nmon
+		self.sysInfo = []
+		self.bbbInfo = []
+		# Holds timestamps for later lookup
+		self.tStamp = {}
 		
 		
 	def outputCSV(self, stat):

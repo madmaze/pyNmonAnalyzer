@@ -39,14 +39,15 @@ import matplotlib.pyplot as plt
 
 
 class pyNmonPlotter:
-	# Holds final 2D arrays of each stat
-	processedData = {}
 	
 	def __init__(self, processedData, outdir="./data/", overwrite=False, debug=False):
 		# TODO: check input vars or "die"
 		self.imgPath = os.path.join(outdir,"img")
 		self.debug = debug
+		
+		# Holds final 2D arrays of each stat
 		self.processedData = processedData
+		
 		if not (os.path.exists(self.imgPath)):
 			try:
 				os.makedirs(self.imgPath)
