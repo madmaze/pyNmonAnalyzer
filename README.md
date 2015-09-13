@@ -38,6 +38,12 @@ If you have pip:
 If you'd like to mess with the source, please feel free to fork 
 this github repo and contribute back changes.
 
+Dependencies:  
+-----
+This tool depends on the python numpy package and the matplotlib package.
+* If you are on a Debian/Ubuntu based system: `sudo apt-get install python-numpy python-matplotlib`  
+* If you are on a RHEL/Fedora/Centos system: `sudo yum install python-numpy python-matplotlib`
+
 
 Usage:
 -----
