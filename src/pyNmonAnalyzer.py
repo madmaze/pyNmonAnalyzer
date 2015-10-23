@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
+from __future__ import print_function
 import os
 import sys
 from shutil import rmtree 
@@ -129,7 +129,7 @@ class pyNmonAnalyzer:
 		
 		logLevel = getattr(log, args.logLevel.upper())
 		if logLevel is None:
-			print "ERROR: Invalid logLevel:", args.loglevel
+			print("ERROR: Invalid logLevel:", args.loglevel)
 			sys.exit()
 		if args.debug:
 			log.basicConfig(level=logLevel, format='%(asctime)s - %(filename)s:%(lineno)d - %(levelname)s - %(message)s')
