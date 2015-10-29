@@ -27,6 +27,7 @@ class pyNmonParser:
 		self.fname = fname
 		self.outdir = outdir
 		self.debug = debug
+		self.knownStats = {}
 		
 		# Holds final 2D arrays of each stat
 		self.processedData = {}
@@ -117,12 +118,14 @@ class pyNmonParser:
 					# two columns and then the real one therefore we skip the first row
 					pass
 				else:
+					# A new stat being added
+					self.knownStats[line[0]] = []
 					for h in line[1:]:
-						# make it an array
-						tmp=[]
-						tmp.append(h)
-						header.append(tmp)
-					self.processedData[line[0]]=header
+						# initialize an array of each header
+						header.append([h])
+						self.knownStats[line[0]].append(h)
+					self.knownStats[line[0]] = self.knownStats[line[0]][1:]
+					self.processedData[line[0]] = header
 			
 	def parse(self):
 		# TODO: check fname
@@ -132,7 +135,7 @@ class pyNmonParser:
 			l=l.strip()
 			bits=l.split(',')
 			self.processLine(bits[0],bits)
-
+		
 		return self.processedData
 	
 	def output(self,outType="csv"):

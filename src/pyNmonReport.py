@@ -100,11 +100,16 @@ def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http:/
 					# match anything that contains a key from reportConfig
 					if i.lower() in c[0].lower():
 						headings.append(c[0])
-						numericArray = [ float(x) for x in c[1:] ]
-						if max(numericArray) > localMax or localMax == None:
-							localMax = max(numericArray)
-						if  min(numericArray) < localMin or localMin == None:
-							localMin = min(numericArray)
+						try:
+							numericArray = [ float(x) for x in c[1:] ]
+						
+							if max(numericArray) > localMax or localMax == None:
+								localMax = max(numericArray)
+							if  min(numericArray) < localMin or localMin == None:
+								localMin = min(numericArray)
+						except:
+							pass
+						
 			displayCols.append(headings)
 			localMin = (0.0 if localMin==None else localMin)
 			localMax = (0.0 if localMax==None else localMax)

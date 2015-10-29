@@ -36,7 +36,11 @@ class pyNmonAnalyzer:
 	bbbInfo = []
 	args = []
 	
-	stdReport = [('CPU_ALL', ['user', 'sys', 'wait'], 'stackedGraph: true, fillGraph: true'), ('DISKBUSY', ['sda1', 'sdb1'], ''), ('MEM', ['memtotal', 'active'], ''), ('NET', ['eth0'], '')]
+	# Default Settings
+	stdReport = [ ('CPU_ALL', ['user', 'sys', 'wait'], 'stackedGraph: true, fillGraph: true'), 
+				 ('DISKBUSY', ['sda1', 'sdb1'], ''), 
+				 ('MEM', ['memtotal', 'active'], ''), 
+				 ('NET', ['eth0'], '')]
 	
 	def __init__(self, args=None, raw_args=None):
 		if args is None and raw_args is None:
@@ -52,20 +56,6 @@ class pyNmonAnalyzer:
 			log.warn("Note: writing default report config file to " + self.args.confFname)
 			self.saveReportConfig(self.stdReport, configFname=self.args.confFname)
 			sys.exit()
-		
-		if self.args.buildReport:
-			# check whether specified report config exists
-			if os.path.exists(self.args.confFname) == False:
-				log.warn("looks like the specified config file(\""+self.args.confFname+"\") does not exist.")
-				ans = raw_input("\t Would you like us to write the default file out for you? [y/n]:")
-				
-				if ans.strip().lower() == "y":
-					self.saveReportConfig(self.stdReport, configFname=self.args.confFname)
-					log.warn("Wrote default config to report.config.")
-					log.warn("Please adjust report.config to ensure the correct devices will be graphed.")
-				else:
-					log.warn("\nNOTE: you could try using the default config file with: -r report.config")
-				sys.exit()
 		
 		# check ouput dir, if not create
 		if os.path.exists(self.args.outdir) and self.args.overwrite:
@@ -90,9 +80,46 @@ class pyNmonAnalyzer:
 		self.nmonParser = pyNmonParser.pyNmonParser(self.args.input_file, self.args.outdir, self.args.overwrite)
 		self.processedData = self.nmonParser.parse()
 		
+		if self.args.buildReport:
+			# check whether specified report config exists
+			if os.path.exists(self.args.confFname) == False:
+				log.warn("looks like the specified config file(\""+self.args.confFname+"\") does not exist.")
+				ans = raw_input("\t Would you like us to generate a template configuration file for you? [y/n]: ")
+				
+				if ans.strip().lower() == "y":
+					question = "Would you like a minimal config or one based on your input file?"
+					question += "\n\t [m]inimal - Basic report showing CPU, Network, Memory and Diskbusy"
+					question += "\n\t [c]ustom - Report configuration listing all available parameters, adding some reasonable defaults"
+					question += "\nPlease choose an option from above: "
+					ans = raw_input(question)
+					if ans.strip().lower() == "c":
+						reportConfiguration=[]
+						for stat in sorted(self.nmonParser.knownStats.keys()):
+							if len(self.nmonParser.knownStats[stat]) > 0:
+								if "CPU" in stat:
+									reportConfiguration.append( (stat, ['user','sys','wait'] , 'stackedGraph: true, fillGraph: true') )
+								elif "MEM" == stat:
+									reportConfiguration.append( (stat, ['memtotal','active'] , '') )
+								else:
+									reportConfiguration.append( (stat, self.nmonParser.knownStats[stat], '') )
+						
+						self.saveReportConfig(reportConfiguration, configFname=self.args.confFname)
+						log.warn("Wrote default config to report.config.")
+						log.warn("Please adjust report.config to ensure the correct devices will be graphed.")
+					elif ans.strip().lower() == "m":
+						self.saveReportConfig(self.stdReport, configFname=self.args.confFname)
+						log.warn("Wrote default config to report.config.")
+						log.warn("Please adjust report.config to ensure the correct devices will be graphed.")
+					else:
+						log.warn("Unknown option: \'%s\'" % ans.strip())
+				else:
+					log.warn("\nNOTE: you could try using the default config file with: -r report.config")
+				sys.exit()
+		
 		if self.args.outputCSV or "inter" in self.args.reportType.lower():
 			log.info("Preparing CSV files..")
 			self.outputData("csv")
+			
 		if self.args.buildReport:
 			if "stat" in self.args.reportType.lower():
 				log.info("Preparing static Report..")

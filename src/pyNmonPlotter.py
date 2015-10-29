@@ -64,14 +64,14 @@ class pyNmonPlotter:
 		for stat, fields, plotOpts in todoList:
 			if "CPU" in stat:
 				# parse NMON date/timestamps and produce datetime objects
-				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
+				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData[stat][0][1:]]
 				values=[]
-				values.append((self.processedData["CPU_ALL"][1][1:],"usr"))
-				values.append((self.processedData["CPU_ALL"][2][1:],"sys"))
-				values.append((self.processedData["CPU_ALL"][3][1:],"wait"))
+				values.append((self.processedData[stat][1][1:],"usr"))
+				values.append((self.processedData[stat][2][1:],"sys"))
+				values.append((self.processedData[stat][3][1:],"wait"))
 				
 				data=(times,values)
-				fname = self.plotStat(data, xlabel="Time", ylabel="CPU load (%)", title="CPU vs Time", isPrct=True, stacked=True)
+				fname = self.plotStat(data, xlabel="Time", ylabel="CPU load (%)", title=stat+" vs Time", isPrct=True, stacked=True)
 				outFiles.append(fname)
 				
 			elif "DISKBUSY" in stat:
@@ -121,26 +121,29 @@ class pyNmonPlotter:
 				fname = self.plotStat(data, xlabel="Time", ylabel="Memory in MB", title="Memory vs Time", isPrct=False, yrange=[0,max(total)*1.2])
 				outFiles.append(fname)
 				
-			elif "NET" in stat:
+			elif "NET" == stat:
 				# parse NMON date/timestamps and produce datetime objects
 				times = [datetime.datetime.strptime(d, "%d-%b-%Y %H:%M:%S") for d in self.processedData["CPU_ALL"][0][1:]]
 				values=[]
 				
 				read=np.array([])
 				write=np.array([])
-				for i in self.processedData["NET"]:
+				highVal=0
+				for i in self.processedData[stat]:
 					colTitle = i[:1][0]
 					for iface in fields:
 						if iface in colTitle and "read" in colTitle:
 							read = np.array([float(x) for x in i[1:]])
+							highVal=max(highVal, max(read))
 							values.append((read,colTitle))
 							
 						elif iface in colTitle and "write" in colTitle:
 							write = np.array([float(x) for x in i[1:]])
+							highVal=max(highVal, max(write))
 							values.append((write,colTitle))
 				
 				data=(times,values)
-				fname = self.plotStat(data, xlabel="Time", ylabel="Network KB/s", title="Net vs Time", yrange=[0,max(max(read),max(write))*1.2])
+				fname = self.plotStat(data, xlabel="Time", ylabel="Network KB/s", title=stat+" vs Time", yrange=[0,np.max(highVal)*1.2])
 				outFiles.append(fname)
 		return outFiles
 			
