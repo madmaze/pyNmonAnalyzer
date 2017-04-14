@@ -19,7 +19,7 @@ from setuptools import setup
 
 setup(
     name = "pyNmonAnalyzer",
-    version = "1.0.3",
+    version = "1.0.4",
     author = "Matthias Lee",
     author_email="pynmonanalyzer@madmaze.net",
     maintainer = "Matthias Lee",
