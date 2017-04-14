@@ -131,7 +131,7 @@ def createInteractiveReport(reportConfig, outPath, data=None, dygraphLoc="http:/
 		elif "[__plots__]" in l:
 			line = ""
 			for i in range(len(dataSources)):
-				line += '<h2>'+verifiedConfigs[i][0]+'</h2></ br>\n <div id="plot' + str(i) + '"  style="width:1000px; height:300px;">loading...</div> </ br></ br> \n'
+				line += '<h2>'+verifiedConfigs[i][0]+'</h2><br />\n <div id="plot' + str(i) + '"  style="width:1000px; height:300px;">loading...</div> <br /><br /> \n'
 		elif "[__dataSources__]" in l:
 			line = ""
 			for s in dataSources:
