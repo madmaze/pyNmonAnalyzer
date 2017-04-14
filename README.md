@@ -121,8 +121,8 @@ Troubleshooting:
 License:
 -------
 ```
-Copyright (c) 2012-2015 Matthias Lee, matthias.a.lee[]gmail.com
-Last edited: Feburary 25th 2015
+Copyright (c) 2012-2017 Matthias Lee, matthias.a.lee[]gmail.com
+Last edited: April 14th 2017
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

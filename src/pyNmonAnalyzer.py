@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Copyright (c) 2012-2015 Matthias Lee
+Copyright (c) 2012-2017 Matthias Lee
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ class pyNmonAnalyzer:
 		parser.add_argument("-b","--buildReport", action="store_true", dest="buildReport", help="report output? (Default: False)")
 		parser.add_argument("-t","--reportType", dest="reportType", default="interactive", help="Should we be generating a \"static\" or \"interactive\" report (Default: interactive)")
 		parser.add_argument("-r","--reportConfig", dest="confFname", default="./report.config", help="Report config file, if none exists: we will write the default config file out (Default: ./report.config)")
-		parser.add_argument("--dygraphLocation", dest="dygraphLoc", default="http://dygraphs.com/dygraph-dev.js", help="Specify local or remote location of dygraphs library. This only applies to the interactive report. (Default: http://dygraphs.com/dygraph-dev.js)")
+		parser.add_argument("--dygraphLocation", dest="dygraphLoc", default="http://dygraphs.com/1.1.0/dygraph-combined.js", help="Specify local or remote location of dygraphs library. This only applies to the interactive report. (Default: http://dygraphs.com/1.1.0/dygraph-combined.js)")
 		parser.add_argument("--defaultConfig", action="store_true", dest="defaultConf", help="Write out a default config file")
 		parser.add_argument("-l","--log",dest="logLevel", default="INFO", help="Logging verbosity, use DEBUG for more output and showing graphs (Default: INFO)")
 		args = parser.parse_args(raw_args)
