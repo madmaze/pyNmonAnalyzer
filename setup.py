@@ -16,15 +16,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from setuptools import setup
-
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except ImportError:
+    long_description = open('README.md').read()
 setup(
     name = "pyNmonAnalyzer",
-    version = "1.0.4",
+    version = "1.0.5",
     author = "Matthias Lee",
     author_email="pynmonanalyzer@madmaze.net",
     maintainer = "Matthias Lee",
     maintainer_email = "pynmonanalyzer@madmaze.net",
     description = ("Python tool for reformatting and plotting/graphing NMON output"),
+    long_description = long_description,
     license = "GPLv3",
     keywords = "python nmon analyzer pynmonanalyzer interactive static report visualization",
     url = "https://github.com/madmaze/pynmonanalyzer",
