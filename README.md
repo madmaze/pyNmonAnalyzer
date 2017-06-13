@@ -27,7 +27,7 @@ Goals:
 
 Getting started:
 -----
-- [Python Nmon Analyzer: moving away from excel macros](http://matthiaslee.com/?q=node/38)
+- [Python Nmon Analyzer: moving away from excel macros](http://matthiaslee.com/python-nmon-analyzer-moving-away-from-excel-macros/)
 
 Installation:
 -----
