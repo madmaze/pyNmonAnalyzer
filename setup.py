@@ -23,7 +23,7 @@ except ImportError:
     long_description = open('README.md').read()
 setup(
     name = "pyNmonAnalyzer",
-    version = "1.0.6",
+    version = "1.0.8",
     author = "Matthias Lee",
     author_email="pynmonanalyzer@madmaze.net",
     maintainer = "Matthias Lee",
