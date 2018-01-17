@@ -1,5 +1,5 @@
 '''
-Copyright (c) 2012-2017 Matthias Lee
+Copyright (c) 2012-2018 Matthias Lee
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ except ImportError:
     long_description = open('README.md').read()
 setup(
     name = "pyNmonAnalyzer",
-    version = "1.0.8",
+    version = "1.0.9",
     author = "Matthias Lee",
     author_email="pynmonanalyzer@madmaze.net",
     maintainer = "Matthias Lee",
