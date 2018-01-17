@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 import os
 import sys
-from shutil import rmtree 
+from shutil import rmtree
 import argparse
 import logging as log
 
-import pyNmonParser
-import pyNmonPlotter
-import pyNmonReport
+from . import pyNmonParser
+from . import pyNmonPlotter
+from . import pyNmonReport
 
 class pyNmonAnalyzer:
 	# Holds final 2D arrays of each stat
@@ -38,7 +38,7 @@ class pyNmonAnalyzer:
 	
 	stdReport = [('CPU_ALL', ['user', 'sys', 'wait'], 'stackedGraph: true, fillGraph: true'), ('DISKBUSY', ['sda1', 'sdb1'], ''), ('MEM', ['memtotal', 'active'], ''), ('NET', ['eth0'], '')]
 	
-	def __init__(self, args=None, raw_args=None):
+	def __init__(self, args=None, raw_args=sys.argv[1:]):
 		if args is None and raw_args is None:
 			log.error("args and rawargs cannot be None.")
 			sys.exit()

@@ -38,6 +38,6 @@ setup(
     package_data = {'pynmonanalyzer': ['test.nmon','interactiveReport.tpl.html']},
     entry_points={
         "console_scripts": [
-            "pyNmonAnalyzer=pynmonanalyzer:main",
+            "pyNmonAnalyzer=pynmonanalyzer.pyNmonAnalyzer:pyNmonAnalyzer",
         ]}
 )

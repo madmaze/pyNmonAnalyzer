@@ -15,13 +15,3 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from pynmonanalyzer import pyNmonAnalyzer as pna
-import sys
-import argparse
-import logging as log
-
-def main(args=None):
-	_ = pna.pyNmonAnalyzer(raw_args=sys.argv[1:])
-
-if __name__ == '__main__':
-	sys.exit(main())
